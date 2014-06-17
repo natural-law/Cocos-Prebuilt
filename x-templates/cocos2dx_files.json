@@ -1,0 +1,10 @@
+{
+    "common": [
+        "libs",
+        "cocos",
+        "extensions",
+        "external"
+    ], 
+    "lua": [
+    ]
+}

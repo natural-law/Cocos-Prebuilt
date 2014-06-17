@@ -1,0 +1,20 @@
+# project files of PyCharm
+tools/.idea/*
+
+# generated files
+gen/*
+tools/build/*
+*.pyc
+
+# Ignore files build by xcode
+*.mode*v*
+*.pbxuser
+*.xcbkptlist
+*.xcworkspacedata
+*.xcuserstate
+*.xccheckout
+xcschememanagement.plist
+.DS_Store
+._.*
+xcuserdata/
+DerivedData/
