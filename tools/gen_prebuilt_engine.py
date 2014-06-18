@@ -15,6 +15,7 @@ import subprocess
 import shutil
 import sys
 import excopy
+import json
 
 XCODE_PROJ_INFO = {
     "cocos2d-x/build/cocos2d_libs.xcodeproj" : [ "build all libs" ],
@@ -23,42 +24,6 @@ XCODE_PROJ_INFO = {
 
 X_IOS_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/ios"
 X_MAC_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/mac"
-X_COPY_CONFIG = [
-    {
-        "from": "cocos2d-x",
-        "to": "gen/cocos2d-x",
-        "include": [
-            "cocos/*.h$",
-            "cocos/math/*.inl$",
-            "extensions/*.h$",
-            "external/*.h$"
-        ]
-    },
-    {
-        "from": "cocos2d-x/cocos/platform/android/java",
-        "to": "gen/cocos2d-x/cocos/platform/android/java"
-    },
-    {
-        "from": "cocos2d-x/cocos/scripting/lua-bindings/script",
-        "to": "gen/cocos2d-x/cocos/scripting/lua-bindings/script"
-    },
-    {
-        "from": "cocos2d-x/templates",
-        "to": "gen/cocos2d-x/templates",
-        "exclude" : [
-            "cpp-template-default/*",
-            "lua-template-runtime/*"
-        ]
-    },
-    {
-        "from": "cocos2d-x/tools/cocos2d-console",
-        "to": "gen/cocos2d-x/tools/cocos2d-console"
-    },
-    {
-        "from": "x-templates",
-        "to": "gen/cocos2d-x/templates"
-    }
-]
 
 def os_is_win32():
     return sys.platform == 'win32'
@@ -92,13 +57,23 @@ def run_shell(cmd, cwd=None):
 class Generator(object):
 
     XCODE_CMD_FMT = "xcodebuild -project \"%s\" -configuration Release -target \"%s\" %s CONFIGURATION_BUILD_DIR=%s"
+    COPY_CFG_FILE = "copy_config.json"
 
     def __init__(self):
         self.tool_dir = os.path.realpath(os.path.dirname(__file__))
         self.root_dir = os.path.join(self.tool_dir, os.path.pardir)
+        self.copy_cfg = self.load_copy_cfg()
+
+    def load_copy_cfg(self):
+        cfg_json = os.path.join(self.tool_dir, Generator.COPY_CFG_FILE)
+        f = open(cfg_json)
+        cfg_info = json.load(f)
+        f.close()
+
+        return cfg_info
 
     def copy_files(self):
-        for cfg in X_COPY_CONFIG:
+        for cfg in self.copy_cfg:
             excopy.copy_files_with_config(cfg, self.root_dir, self.root_dir)
 
     def build_ios_mac(self):
