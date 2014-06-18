@@ -20,8 +20,8 @@ XCODE_PROJ_INFO = {
     "cocos2d-x/cocos/scripting/lua-bindings/proj.ios_mac/cocos2d_lua_bindings.xcodeproj" : [ "luabindings" ]
 }
 
-X_IOS_OUTPUT_DIR = "gen/cocos2d-x/libs/ios"
-X_MAC_OUTPUT_DIR = "gen/cocos2d-x/libs/mac"
+X_IOS_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/ios"
+X_MAC_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/mac"
 X_COPY_CONFIG = [
     {
         "from": "cocos2d-x",

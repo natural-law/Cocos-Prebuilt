@@ -1,6 +1,6 @@
 {
     "common": [
-        "libs",
+        "prebuilt",
         "cocos",
         "extensions",
         "external"
