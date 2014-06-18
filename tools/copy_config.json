@@ -7,7 +7,14 @@
             "cocos/math/*.inl$",
             "extensions/*.h$",
             "external/*.h$",
-            "external/lua/luasocket/*.lua$"
+            "external/lua/luasocket/*.lua$",
+            "external/win32-specific/gles/prebuilt/*.dll$",
+            "external/win32-specific/zlib/prebuilt/*.dll$",
+            "external/win32-specific/icon/prebuilt/*.dll$",
+            "external/curl/prebuilt/win32/*.dll$",
+            "external/lua/luajit/prebuilt/win32/*.dll$",
+            "external/websockets/prebuilt/win32/*.dll$",
+            "external/tiff/prebuilt/win32/*.dll$"
         ]
     },
     {
@@ -22,7 +29,8 @@
         "from": "cocos2d-x/templates",
         "to": "gen/cocos2d-x/templates",
         "exclude" : [
-            "cpp-template-default/*"
+            "cpp-template-default/*",
+            "lua-template-default/*"
         ]
     },
     {
@@ -31,6 +39,9 @@
     },
     {
         "from": "x-templates",
-        "to": "gen/cocos2d-x/templates"
+        "to": "gen/cocos2d-x/templates",
+        "exclude": [
+            "lua-template-default/*"
+        ]
     }
 ]
