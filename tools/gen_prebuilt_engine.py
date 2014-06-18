@@ -1,18 +1,19 @@
 #!/usr/bin/python
 # ----------------------------------------------------------------------------
-# build libs
+# generate the prebuilt engine for Cocos Engine
 #
 # Copyright 2014 (C) zhangbin
 #
 # License: MIT
 # ----------------------------------------------------------------------------
 '''
-Build the libs project of engine
+Generate the prebuilt engine for Cocos Engine
 '''
 
 import os
 import subprocess
 import shutil
+import sys
 import excopy
 
 XCODE_PROJ_INFO = {
@@ -59,6 +60,12 @@ X_COPY_CONFIG = [
     }
 ]
 
+def os_is_win32():
+    return sys.platform == 'win32'
+
+def os_is_mac():
+    return sys.platform == 'darwin'
+
 def run_shell(cmd, cwd=None):
     """
     Runs shell command.
@@ -82,10 +89,9 @@ def run_shell(cmd, cwd=None):
 
     return p.returncode
 
-class LibsBuilder(object):
+class Generator(object):
 
-    IOS_CMD_FMT = "xcodebuild -project \"%s\" -configuration Release -target \"%s iOS\" -sdk %s CONFIGURATION_BUILD_DIR=%s"
-    MAC_CMD_FMT = "xcodebuild -project \"%s\" -configuration Release -target \"%s Mac\" CONFIGURATION_BUILD_DIR=%s"
+    XCODE_CMD_FMT = "xcodebuild -project \"%s\" -configuration Release -target \"%s\" %s CONFIGURATION_BUILD_DIR=%s"
 
     def __init__(self):
         self.tool_dir = os.path.realpath(os.path.dirname(__file__))
@@ -98,25 +104,52 @@ class LibsBuilder(object):
     def build_ios_mac(self):
         x_ios_out_dir = os.path.join(self.root_dir, X_IOS_OUTPUT_DIR)
         x_mac_out_dir = os.path.join(self.root_dir, X_MAC_OUTPUT_DIR)
+        x_ios_sim_libs_dir = os.path.join(x_ios_out_dir, "simulator")
+        x_ios_dev_libs_dir = os.path.join(x_ios_out_dir, "device")
         for key in XCODE_PROJ_INFO.keys():
             proj_path = os.path.join(self.root_dir, key)
             for target in XCODE_PROJ_INFO[key]:
-                build_cmd = LibsBuilder.IOS_CMD_FMT % (proj_path, target, "iphonesimulator", os.path.join(x_ios_out_dir, "simulator"))
+                build_cmd = Generator.XCODE_CMD_FMT % (proj_path, "%s iOS" % target, "-sdk iphonesimulator", x_ios_sim_libs_dir)
                 run_shell(build_cmd, self.tool_dir)
 
-                build_cmd = LibsBuilder.IOS_CMD_FMT % (proj_path, target, "iphoneos", os.path.join(x_ios_out_dir, "device"))
+                build_cmd = Generator.XCODE_CMD_FMT % (proj_path, "%s iOS" % target, "-sdk iphoneos", x_ios_dev_libs_dir)
                 run_shell(build_cmd, self.tool_dir)
 
-                build_cmd = LibsBuilder.MAC_CMD_FMT % (proj_path, target, x_mac_out_dir)
+                build_cmd = Generator.XCODE_CMD_FMT % (proj_path, "%s Mac" % target, "", x_mac_out_dir)
                 run_shell(build_cmd, self.tool_dir)
+
+        # generate fat libs for iOS
+        for lib in os.listdir(x_ios_sim_libs_dir):
+            sim_lib = os.path.join(x_ios_sim_libs_dir, lib)
+            dev_lib = os.path.join(x_ios_dev_libs_dir, lib)
+            output_lib = os.path.join(x_ios_out_dir, lib)
+            lipo_cmd = "lipo -create -output \"%s\" \"%s\" \"%s\"" % (output_lib, sim_lib, dev_lib)
+
+            run_shell(lipo_cmd)
+
+        # remove the simulator & device libs in iOS
+        shutil.rmtree(x_ios_sim_libs_dir)
+        shutil.rmtree(x_ios_dev_libs_dir)
 
     def build_all_libs(self):
+        if os_is_mac():
+            # build for iOS & Mac
+            self.build_ios_mac()
+
+    def clean_gen(self):
+        gen_dir = os.path.join(self.root_dir, "gen")
+        if os.path.exists(gen_dir):
+            shutil.rmtree(gen_dir)
+
+    def do_generate(self):
+        # clean the files generated before
+        self.clean_gen()
+
         # copy the necessary files
         self.copy_files()
 
-        # build for iOS & Mac
-        self.build_ios_mac()
+        self.build_all_libs()
 
 if __name__ == "__main__":
-    builder = LibsBuilder()
-    builder.build_all_libs()
+    gen_obj = Generator()
+    gen_obj.do_generate()
