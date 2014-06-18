@@ -6,7 +6,8 @@
             "cocos/*.h$",
             "cocos/math/*.inl$",
             "extensions/*.h$",
-            "external/*.h$"
+            "external/*.h$",
+            "external/lua/luasocket/*.lua$"
         ]
     },
     {
@@ -21,8 +22,7 @@
         "from": "cocos2d-x/templates",
         "to": "gen/cocos2d-x/templates",
         "exclude" : [
-            "cpp-template-default/*",
-            "lua-template-runtime/*"
+            "cpp-template-default/*"
         ]
     },
     {
