@@ -17,6 +17,8 @@ import sys
 import excopy
 import json
 
+from argparse import ArgumentParser
+
 XCODE_PROJ_INFO = {
     "cocos2d-x/build/cocos2d_libs.xcodeproj" : [ "build all libs" ],
     "cocos2d-x/cocos/scripting/lua-bindings/proj.ios_mac/cocos2d_lua_bindings.xcodeproj" : [ "luabindings" ]
@@ -63,10 +65,12 @@ class Generator(object):
     XCODE_CMD_FMT = "xcodebuild -project \"%s\" -configuration Release -target \"%s\" %s CONFIGURATION_BUILD_DIR=%s"
     COPY_CFG_FILE = "copy_config.json"
 
-    def __init__(self):
+    def __init__(self, args):
         self.tool_dir = os.path.realpath(os.path.dirname(__file__))
         self.root_dir = os.path.join(self.tool_dir, os.path.pardir)
         self.copy_cfg = self.load_copy_cfg()
+        self.need_clean = args.need_clean
+        self.no_android = args.no_android
 
     def load_copy_cfg(self):
         cfg_json = os.path.join(self.tool_dir, Generator.COPY_CFG_FILE)
@@ -115,6 +119,8 @@ class Generator(object):
         # copy libs to the template dir
         libs_dir = os.path.join(proj_path, LIBS_PATH)
         target_libs_dir = os.path.join(self.root_dir, "gen", os.path.basename(engine_dir), "templates", "%s-template-runtime" % language, LIBS_PATH)
+        if os.path.exists(target_libs_dir):
+            shutil.rmtree(target_libs_dir)
         shutil.copytree(libs_dir, target_libs_dir)
 
         # remove the project
@@ -162,7 +168,8 @@ class Generator(object):
             # build for win32
             self.build_win32()
 
-        self.build_android("lua")
+        if not self.no_android:
+            self.build_android("lua")
 
     def clean_gen(self):
         gen_dir = os.path.join(self.root_dir, "gen")
@@ -170,14 +177,23 @@ class Generator(object):
             shutil.rmtree(gen_dir)
 
     def do_generate(self):
-        # clean the files generated before
-        self.clean_gen()
+        if self.need_clean:
+            # clean the files generated before
+            self.clean_gen()
 
-        # copy the necessary files
-        self.copy_files()
+            # copy the necessary files
+            self.copy_files()
 
         self.build_all_libs()
 
 if __name__ == "__main__":
-    gen_obj = Generator()
+    parser = ArgumentParser(description="Generate prebuilt engine for Cocos Engine.")
+    parser.add_argument('-c', dest='need_clean', action="store_true", help='Remove the \"gen\" directory first, and copy files again.')
+    parser.add_argument('-n', "--no-android", dest='no_android', action="store_true", help='Not build android so.')
+    (args, unknown) = parser.parse_known_args()
+
+    if len(unknown) > 0:
+        print("unknown arguments: %s" % unknown)
+
+    gen_obj = Generator(args)
     gen_obj.do_generate()
