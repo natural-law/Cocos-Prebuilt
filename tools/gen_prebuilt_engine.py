@@ -25,6 +25,10 @@ XCODE_PROJ_INFO = {
 X_IOS_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/ios"
 X_MAC_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/mac"
 
+LIBS_PATH = "frameworks/runtime-src/proj.android/libs"
+MK_PATH = "frameworks/runtime-src/proj.android/jni/Application.mk"
+CONSOLE_PATH = "tools/cocos2d-console/bin"
+
 def os_is_win32():
     return sys.platform == 'win32'
 
@@ -76,6 +80,49 @@ class Generator(object):
         for cfg in self.copy_cfg:
             excopy.copy_files_with_config(cfg, self.root_dir, self.root_dir)
 
+    def modify_mk(self, mk_file):
+        if os.path.isfile(mk_file):
+            file_obj = open(mk_file, "a")
+            file_obj.write("\nAPP_ABI :=armeabi armeabi-v7a x86\n")
+            file_obj.close()
+
+    def build_android(self, language):
+        # build .so for android
+        if language == "js":
+            engine_dir = os.path.join(self.root_dir, "cocos2d-js")
+        else:
+            engine_dir = os.path.join(self.root_dir, "cocos2d-x")
+
+        console_dir = os.path.join(engine_dir, CONSOLE_PATH)
+        cmd_path = os.path.join(console_dir, "cocos")
+        proj_name = "My%sGame" % language
+        proj_path = os.path.join(engine_dir, proj_name)
+        if os.path.exists(proj_path):
+            shutil.rmtree(proj_path)
+
+        # create a runtime project
+        create_cmd = "%s new -l %s -t runtime -d %s %s" % (cmd_path, language, engine_dir, proj_name)
+        run_shell(create_cmd)
+
+        # Add multi ABI in Application.mk
+        mk_file = os.path.join(proj_path, MK_PATH)
+        self.modify_mk(mk_file)
+
+        # build it
+        build_cmd = "%s compile -s %s -p android --ndk-mode release -j 4" % (cmd_path, proj_path)
+        run_shell(build_cmd)
+
+        # copy libs to the template dir
+        libs_dir = os.path.join(proj_path, LIBS_PATH)
+        target_libs_dir = os.path.join(self.root_dir, "gen", os.path.basename(engine_dir), "templates", "%s-template-runtime" % language, LIBS_PATH)
+        shutil.copytree(libs_dir, target_libs_dir)
+
+        # remove the project
+        shutil.rmtree(proj_path)
+
+    def build_win32(self):
+        print("build win32 invoked!")
+
     def build_ios_mac(self):
         x_ios_out_dir = os.path.join(self.root_dir, X_IOS_OUTPUT_DIR)
         x_mac_out_dir = os.path.join(self.root_dir, X_MAC_OUTPUT_DIR)
@@ -110,6 +157,12 @@ class Generator(object):
         if os_is_mac():
             # build for iOS & Mac
             self.build_ios_mac()
+
+        if os_is_win32():
+            # build for win32
+            self.build_win32()
+
+        self.build_android("lua")
 
     def clean_gen(self):
         gen_dir = os.path.join(self.root_dir, "gen")
