@@ -19,6 +19,9 @@ import json
 
 from argparse import ArgumentParser
 
+if sys.platform == 'win32':
+    import _winreg
+
 XCODE_PROJ_INFO = {
     "cocos2d-x/build/cocos2d_libs.xcodeproj" : [ "build all libs" ],
     "cocos2d-x/cocos/scripting/lua-bindings/proj.ios_mac/cocos2d_lua_bindings.xcodeproj" : [ "luabindings" ]
@@ -26,10 +29,20 @@ XCODE_PROJ_INFO = {
 
 X_IOS_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/ios"
 X_MAC_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/mac"
+X_WIN32_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/win32"
 
 LIBS_PATH = "frameworks/runtime-src/proj.android/libs"
 MK_PATH = "frameworks/runtime-src/proj.android/jni/Application.mk"
 CONSOLE_PATH = "tools/cocos2d-console/bin"
+
+WIN32_PROJ_INFO = {
+    "cocos2d-x/build/cocos2d-win32.vc2012.sln" : [
+        "libAudio", "libBox2D", "libchipmunk",
+        "libcocos2d", "libCocosBuilder", "libCocosStudio",
+        "libExtensions", "libGUI", "libLocalStorage",
+        "liblua", "libNetwork", "libSpine"
+    ]
+}
 
 def os_is_win32():
     return sys.platform == 'win32'
@@ -59,6 +72,9 @@ def run_shell(cmd, cwd=None):
         raise subprocess.CalledProcessError(returncode=p.returncode, cmd=cmd)
 
     return p.returncode
+
+class GenerateError(Exception):
+    pass
 
 class Generator(object):
 
@@ -126,8 +142,128 @@ class Generator(object):
         # remove the project
         shutil.rmtree(proj_path)
 
+    def get_required_vs_version(self, proj_file):
+        # get the VS version required by the project
+        import re
+        file_obj = open(proj_file)
+        pattern = re.compile(r"^# Visual Studio.+(\d{4})")
+        num = None
+        for line in file_obj:
+            match = pattern.match(line)
+            if match is not None:
+                num = match.group(1)
+                break
+
+        if num is not None:
+            if num == "2012":
+                ret = "11.0"
+            elif num == "2013":
+                ret = "12.0"
+            else:
+                ret = None
+        else:
+            ret = None
+
+        return ret
+
+    def get_vs_cmd_path(self, vs_reg, required_vs_version):
+        # get the correct available VS path
+        needUpgrade = False
+        vsPath = None
+        i = 0
+        try:
+            while True:
+                version = _winreg.EnumKey(vs_reg, i)
+                try:
+                    if float(version) >= float(required_vs_version):
+                        key = _winreg.OpenKey(vs_reg, r"SxS\VS7")
+                        vsPath, type = _winreg.QueryValueEx(key, version)
+
+                        if float(version) > float(required_vs_version):
+                            needUpgrade = True
+
+                        key.close()
+                        break
+                except:
+                    pass
+                i += 1
+        except WindowsError:
+            pass
+
+        if vsPath is None:
+            message = "Can't find correct Visual Studio's path in the regedit"
+            raise GenerateError(message)
+
+        commandPath = os.path.join(vsPath, "Common7", "IDE", "devenv")
+        return (commandPath, needUpgrade)
+
+    def _is_32bit_windows(self):
+        arch = os.environ['PROCESSOR_ARCHITECTURE'].lower()
+        archw = os.environ.has_key("PROCESSOR_ARCHITEW6432")
+        return (arch == "x86" and not archw)
+
     def build_win32(self):
-        print("build win32 invoked!")
+        print("Building Win32")
+
+        # win32_projectdir = self._platforms.project_path()
+        # output_dir = self._output_dir
+
+        # find the VS in register
+        try:
+            if self._is_32bit_windows():
+                reg_flag = _winreg.KEY_WOW64_32KEY
+            else:
+                reg_flag = _winreg.KEY_WOW64_64KEY
+
+            vs = _winreg.OpenKey(
+                _winreg.HKEY_LOCAL_MACHINE,
+                r"SOFTWARE\Microsoft\VisualStudio",
+                0,
+                _winreg.KEY_READ | reg_flag
+            )
+
+        except WindowsError:
+            message = "Visual Studio wasn't installed"
+            raise GenerateError(message)
+
+        for key in WIN32_PROJ_INFO.keys():
+            proj_path = os.path.join(self.root_dir, key)
+            required_vs_version = self.get_required_vs_version(proj_path)
+            if required_vs_version is None:
+                raise GenerateError("Can't parse the sln file to find required VS version")
+
+            commandPath, needUpgrade = self.get_vs_cmd_path(vs, required_vs_version)
+
+            # upgrade projects
+            if needUpgrade:
+                commandUpgrade = ' '.join([
+                    "\"%s\"" % commandPath,
+                    "\"%s\"" % proj_path,
+                    "/Upgrade"
+                ])
+                run_shell(commandUpgrade)
+
+            build_folder_path = os.path.join(os.path.dirname(proj_path), "Release.win32")
+            win32_output_dir = os.path.join(self.root_dir, X_WIN32_OUTPUT_DIR)
+            if os.path.exists(win32_output_dir):
+                shutil.rmtree(win32_output_dir)
+            os.makedirs(win32_output_dir)
+
+            for proj_name in WIN32_PROJ_INFO[key]:
+                # build the projects
+                commands = ' '.join([
+                    "\"%s\"" % commandPath,
+                    "\"%s\"" % proj_path,
+                    "/Build \"Release|Win32\"",
+                    "/Project \"%s\"" % proj_name
+                ])
+                run_shell(commands)
+
+                # copy the lib into prebuilt dir
+                lib_file_path = os.path.join(build_folder_path, "%s.lib" % proj_name)
+                shutil.copy(lib_file_path, win32_output_dir)
+
+        print("Win32 build succeeded.")
 
     def build_ios_mac(self):
         x_ios_out_dir = os.path.join(self.root_dir, X_IOS_OUTPUT_DIR)
