@@ -3,11 +3,15 @@
         "from": "cocos2d-x",
         "to": "gen/cocos2d-x",
         "include": [
+            "cocos/*Android.mk$",
             "cocos/*.h$",
             "cocos/math/*.inl$",
             "cocos/*.props$",
             "extensions/*.h$",
+            "extensions/Android.mk",
             "external/*.h$",
+            "external/*/Android.mk$",
+            "external/*/prebuilt/android/*.a$",
             "external/lua/luasocket/*.lua$"
         ]
     },

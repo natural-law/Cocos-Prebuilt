@@ -30,8 +30,10 @@ XCODE_PROJ_INFO = {
 X_IOS_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/ios"
 X_MAC_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/mac"
 X_WIN32_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/win32"
+X_ANDROID_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/android"
 
-LIBS_PATH = "frameworks/runtime-src/proj.android/libs"
+ANDROID_SO_PATH = "frameworks/runtime-src/proj.android/libs"
+ANDROID_A_PATH = "frameworks/runtime-src/proj.android/obj/local"
 MK_PATH = "frameworks/runtime-src/proj.android/jni/Application.mk"
 CONSOLE_PATH = "tools/cocos2d-console/bin"
 
@@ -80,6 +82,7 @@ class Generator(object):
 
     XCODE_CMD_FMT = "xcodebuild -project \"%s\" -configuration Release -target \"%s\" %s CONFIGURATION_BUILD_DIR=%s"
     COPY_CFG_FILE = "copy_config.json"
+    ANDROID_LIBS_CFG = "android_mks.json"
 
     def __init__(self, args):
         self.tool_dir = os.path.realpath(os.path.dirname(__file__))
@@ -87,6 +90,7 @@ class Generator(object):
         self.copy_cfg = self.load_copy_cfg()
         self.need_clean = args.need_clean
         self.no_android = args.no_android
+        self.use_incredibuild = args.use_incredibuild
 
     def load_copy_cfg(self):
         cfg_json = os.path.join(self.tool_dir, Generator.COPY_CFG_FILE)
@@ -103,7 +107,7 @@ class Generator(object):
     def modify_mk(self, mk_file):
         if os.path.isfile(mk_file):
             file_obj = open(mk_file, "a")
-            file_obj.write("\nAPP_ABI :=armeabi armeabi-v7a x86\n")
+            file_obj.write("\nAPP_ABI :=armeabi armeabi-v7a\n")
             file_obj.close()
 
     def build_android(self, language):
@@ -132,12 +136,35 @@ class Generator(object):
         build_cmd = "%s compile -s %s -p android --ndk-mode release -j 4" % (cmd_path, proj_path)
         run_shell(build_cmd)
 
-        # copy libs to the template dir
-        libs_dir = os.path.join(proj_path, LIBS_PATH)
-        target_libs_dir = os.path.join(self.root_dir, "gen", os.path.basename(engine_dir), "templates", "%s-template-runtime" % language, LIBS_PATH)
+        # copy .so to the template dir
+        libs_dir = os.path.join(proj_path, ANDROID_SO_PATH)
+        target_libs_dir = os.path.join(self.root_dir, "gen", os.path.basename(engine_dir), "templates", "%s-template-runtime" % language, ANDROID_SO_PATH)
         if os.path.exists(target_libs_dir):
             shutil.rmtree(target_libs_dir)
         shutil.copytree(libs_dir, target_libs_dir)
+
+        # copy .a to prebuilt dir
+        obj_dir = os.path.join(proj_path, ANDROID_A_PATH)
+        prebuilt_dir = os.path.join(self.root_dir, X_ANDROID_OUTPUT_DIR)
+        copy_cfg = {
+            "from": obj_dir,
+            "to": prebuilt_dir,
+            "include": [
+                "*.a$"
+            ]
+        }
+        excopy.copy_files_with_config(copy_cfg, obj_dir, prebuilt_dir)
+
+        # modify the mk files to prebuilt version
+        android_mks_json = os.path.join(self.tool_dir, Generator.ANDROID_LIBS_CFG)
+        f = open(android_mks_json)
+        mk_files = json.load(f)
+        f.close()
+        import gen_prebuilt_mk
+        for mk_file in mk_files:
+            mk_file_path = os.path.join(self.root_dir, "gen", "cocos2d-x", mk_file)
+            tmp_obj = gen_prebuilt_mk.MKGenerator(mk_file_path, prebuilt_dir, mk_file_path)
+            tmp_obj.do_generate()
 
         # remove the project
         shutil.rmtree(proj_path)
@@ -166,7 +193,12 @@ class Generator(object):
 
         return ret
 
-    def get_vs_cmd_path(self, vs_reg, required_vs_version):
+    def get_vs_cmd_path(self, vs_reg, proj_path):
+        # get required vs version
+        required_vs_version = self.get_required_vs_version(proj_path)
+        if required_vs_version is None:
+            raise GenerateError("Can't parse the sln file to find required VS version")
+
         # get the correct available VS path
         needUpgrade = False
         vsPath = None
@@ -202,11 +234,26 @@ class Generator(object):
         archw = os.environ.has_key("PROCESSOR_ARCHITEW6432")
         return (arch == "x86" and not archw)
 
+    def build_win32_proj(self, cmd_path, sln_path, proj_name, mode):
+        if self.use_incredibuild:
+            build_cmd = " ".join([
+                "\"%s\"" % cmd_path,
+                "\"%s\"" % sln_path,
+                "/%s" % mode,
+                "/prj=%s" % proj_name,
+                "/cfg=\"Release|Win32\""
+            ])
+        else:
+            build_cmd = " ".join([
+                "\"%s\"" % cmd_path,
+                "\"%s\"" % sln_path,
+                "/%s \"Release|Win32\"" % mode,
+                "/Project \"%s\"" % proj_name
+            ])
+        run_shell(build_cmd)
+
     def build_win32(self):
         print("Building Win32")
-
-        # win32_projectdir = self._platforms.project_path()
-        # output_dir = self._output_dir
 
         # find the VS in register
         try:
@@ -215,7 +262,7 @@ class Generator(object):
             else:
                 reg_flag = _winreg.KEY_WOW64_64KEY
 
-            vs = _winreg.OpenKey(
+            vs_reg = _winreg.OpenKey(
                 _winreg.HKEY_LOCAL_MACHINE,
                 r"SOFTWARE\Microsoft\VisualStudio",
                 0,
@@ -228,21 +275,14 @@ class Generator(object):
 
         for key in WIN32_PROJ_INFO.keys():
             proj_path = os.path.join(self.root_dir, key)
-            required_vs_version = self.get_required_vs_version(proj_path)
-            if required_vs_version is None:
-                raise GenerateError("Can't parse the sln file to find required VS version")
+            vs_command, needUpgrade = self.get_vs_cmd_path(vs_reg, proj_path)
 
-            commandPath, needUpgrade = self.get_vs_cmd_path(vs, required_vs_version)
+            if self.use_incredibuild:
+                cmd_path = "BuildConsole"
+            else:
+                cmd_path = vs_command
 
-            # upgrade projects
-            if needUpgrade:
-                commandUpgrade = ' '.join([
-                    "\"%s\"" % commandPath,
-                    "\"%s\"" % proj_path,
-                    "/Upgrade"
-                ])
-                run_shell(commandUpgrade)
-
+            # get the build folder & win32 output folder
             build_folder_path = os.path.join(os.path.dirname(proj_path), "Release.win32")
             if os.path.exists(build_folder_path):
                 shutil.rmtree(build_folder_path)
@@ -253,26 +293,23 @@ class Generator(object):
                 shutil.rmtree(win32_output_dir)
             os.makedirs(win32_output_dir)
 
+            # upgrade projects
+            if needUpgrade:
+                commandUpgrade = ' '.join([
+                    "\"%s\"" % vs_command,
+                    "\"%s\"" % proj_path,
+                    "/Upgrade"
+                ])
+                run_shell(commandUpgrade)
+
             for proj_name in WIN32_PROJ_INFO[key]:
                 # build the projects
-                commands = ' '.join([
-                    "\"%s\"" % commandPath,
-                    "\"%s\"" % proj_path,
-                    "/Build \"Release|Win32\"",
-                    "/Project \"%s\"" % proj_name
-                ])
-                run_shell(commands)
+                self.build_win32_proj(cmd_path, proj_path, proj_name, "build")
 
                 lib_file_path = os.path.join(build_folder_path, "%s.lib" % proj_name)
                 if not os.path.exists(lib_file_path):
                     # if the lib is not generated, rebuild the project
-                    rebuild_cmd = ' '.join([
-                        "\"%s\"" % commandPath,
-                        "\"%s\"" % proj_path,
-                        "/Rebuild \"Release|Win32\"",
-                        "/Project \"%s\"" % proj_name
-                    ])
-                    run_shell(rebuild_cmd)
+                    self.build_win32_proj(cmd_path, proj_path, proj_name, "rebuild")
 
                 if not os.path.exists(lib_file_path):
                     raise GenerateError("Library %s not generated as expected!" % lib_file_path)
@@ -345,6 +382,7 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="Generate prebuilt engine for Cocos Engine.")
     parser.add_argument('-c', dest='need_clean', action="store_true", help='Remove the \"gen\" directory first, and copy files again.')
     parser.add_argument('-n', "--no-android", dest='no_android', action="store_true", help='Not build android so.')
+    parser.add_argument('-i', "--incredibuild", dest='use_incredibuild', action="store_true", help='Use incredibuild to build win32 projects. Only available on windows.')
     (args, unknown) = parser.parse_known_args()
 
     if len(unknown) > 0:
