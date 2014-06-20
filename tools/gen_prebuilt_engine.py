@@ -244,6 +244,10 @@ class Generator(object):
                 run_shell(commandUpgrade)
 
             build_folder_path = os.path.join(os.path.dirname(proj_path), "Release.win32")
+            if os.path.exists(build_folder_path):
+                shutil.rmtree(build_folder_path)
+            os.makedirs(build_folder_path)
+
             win32_output_dir = os.path.join(self.root_dir, X_WIN32_OUTPUT_DIR)
             if os.path.exists(win32_output_dir):
                 shutil.rmtree(win32_output_dir)
@@ -259,9 +263,24 @@ class Generator(object):
                 ])
                 run_shell(commands)
 
-                # copy the lib into prebuilt dir
                 lib_file_path = os.path.join(build_folder_path, "%s.lib" % proj_name)
-                shutil.copy(lib_file_path, win32_output_dir)
+                if not os.path.exists(lib_file_path):
+                    # if the lib is not generated, rebuild the project
+                    rebuild_cmd = ' '.join([
+                        "\"%s\"" % commandPath,
+                        "\"%s\"" % proj_path,
+                        "/Rebuild \"Release|Win32\"",
+                        "/Project \"%s\"" % proj_name
+                    ])
+                    run_shell(rebuild_cmd)
+
+                if not os.path.exists(lib_file_path):
+                    raise GenerateError("Library %s not generated as expected!" % lib_file_path)
+
+            # copy the libs into prebuilt dir
+            for file_name in os.listdir(build_folder_path):
+                file_path = os.path.join(build_folder_path, file_name)
+                shutil.copy(file_path, win32_output_dir)
 
         print("Win32 build succeeded.")
 

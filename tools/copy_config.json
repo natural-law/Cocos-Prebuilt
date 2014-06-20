@@ -5,16 +5,10 @@
         "include": [
             "cocos/*.h$",
             "cocos/math/*.inl$",
+            "cocos/*.props$",
             "extensions/*.h$",
             "external/*.h$",
-            "external/lua/luasocket/*.lua$",
-            "external/win32-specific/gles/prebuilt/*.dll$",
-            "external/win32-specific/zlib/prebuilt/*.dll$",
-            "external/win32-specific/icon/prebuilt/*.dll$",
-            "external/curl/prebuilt/win32/*.dll$",
-            "external/lua/luajit/prebuilt/win32/*.dll$",
-            "external/websockets/prebuilt/win32/*.dll$",
-            "external/tiff/prebuilt/win32/*.dll$"
+            "external/lua/luasocket/*.lua$"
         ]
     },
     {
