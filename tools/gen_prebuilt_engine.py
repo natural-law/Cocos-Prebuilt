@@ -324,6 +324,11 @@ class Generator(object):
     def build_ios_mac(self):
         x_ios_out_dir = os.path.join(self.root_dir, X_IOS_OUTPUT_DIR)
         x_mac_out_dir = os.path.join(self.root_dir, X_MAC_OUTPUT_DIR)
+        if os.path.exists(x_ios_out_dir):
+            shutil.rmtree(x_ios_out_dir)
+        if os.path.exists(x_mac_out_dir):
+            shutil.rmtree(x_mac_out_dir)
+
         x_ios_sim_libs_dir = os.path.join(x_ios_out_dir, "simulator")
         x_ios_dev_libs_dir = os.path.join(x_ios_out_dir, "device")
         for key in XCODE_PROJ_INFO.keys():
@@ -375,6 +380,11 @@ class Generator(object):
 
             # copy the necessary files
             self.copy_files()
+
+            # create win32 directory
+            win32_dir = os.path.join(self.root_dir, X_WIN32_OUTPUT_DIR)
+            if not os.path.exists(win32_dir):
+                os.makedirs(win32_dir)
 
         self.build_all_libs()
 
