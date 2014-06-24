@@ -114,14 +114,14 @@ class Generator(object):
 
         # copy .so to the template dir
         libs_dir = os.path.join(proj_path, ANDROID_SO_PATH)
-        target_libs_dir = os.path.join(self.root_dir, "gen", os.path.basename(engine_dir), "templates", "%s-template-runtime" % language, ANDROID_SO_PATH)
+        target_libs_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "templates", "%s-template-runtime" % language, ANDROID_SO_PATH)
         if os.path.exists(target_libs_dir):
             shutil.rmtree(target_libs_dir)
         shutil.copytree(libs_dir, target_libs_dir)
 
         # copy .a to prebuilt dir
         obj_dir = os.path.join(proj_path, ANDROID_A_PATH)
-        prebuilt_dir = os.path.join(self.root_dir, "gen", engine_name, "prebuilt", "android")
+        prebuilt_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "prebuilt", "android")
         copy_cfg = {
             "from": obj_dir,
             "to": prebuilt_dir,
@@ -134,7 +134,7 @@ class Generator(object):
         # modify the mk files to prebuilt version
         import gen_prebuilt_mk
         for mk_file in self.android_mks:
-            mk_file_path = os.path.join(self.root_dir, "gen", "cocos2d-x", mk_file)
+            mk_file_path = os.path.join(self.root_dir, mk_file)
             tmp_obj = gen_prebuilt_mk.MKGenerator(mk_file_path, prebuilt_dir, mk_file_path)
             tmp_obj.do_generate()
 
@@ -339,7 +339,7 @@ class Generator(object):
             self.build_android("lua")
 
     def clean_gen(self):
-        gen_dir = os.path.join(self.root_dir, "gen")
+        gen_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks")
         if os.path.exists(gen_dir):
             shutil.rmtree(gen_dir)
 
@@ -355,7 +355,7 @@ class Generator(object):
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Generate prebuilt engine for Cocos Engine.")
-    parser.add_argument('-c', dest='need_clean', action="store_true", help='Remove the \"gen\" directory first, and copy files again.')
+    parser.add_argument('-c', dest='need_clean', action="store_true", help='Remove the \"gen/cocos/frameworks\" directory first, and copy files again.')
     parser.add_argument('-n', "--no-android", dest='no_android', action="store_true", help='Not build android so.')
     parser.add_argument('-i', "--incredibuild", dest='use_incredibuild', action="store_true", help='Use incredibuild to build win32 projects. Only available on windows.')
     (args, unknown) = parser.parse_known_args()

@@ -2,7 +2,7 @@
     "copy_config" : [
         {
             "from": "cocos2d-x",
-            "to": "gen/cocos2d-x",
+            "to": "gen/cocos/frameworks/cocos2d-x",
             "include": [
                 "cocos/*Android.mk$",
                 "cocos/*.h$",
@@ -18,15 +18,15 @@
         },
         {
             "from": "cocos2d-x/cocos/platform/android/java",
-            "to": "gen/cocos2d-x/cocos/platform/android/java"
+            "to": "gen/cocos/frameworks/cocos2d-x/cocos/platform/android/java"
         },
         {
             "from": "cocos2d-x/cocos/scripting/lua-bindings/script",
-            "to": "gen/cocos2d-x/cocos/scripting/lua-bindings/script"
+            "to": "gen/cocos/frameworks/cocos2d-x/cocos/scripting/lua-bindings/script"
         },
         {
             "from": "cocos2d-x/templates",
-            "to": "gen/cocos2d-x/templates",
+            "to": "gen/cocos/frameworks/cocos2d-x/templates",
             "exclude" : [
                 "cpp-template-default/*",
                 "lua-template-default/*"
@@ -34,43 +34,43 @@
         },
         {
             "from": "cocos2d-x/tools/cocos2d-console",
-            "to": "gen/cocos2d-x/tools/cocos2d-console"
+            "to": "gen/cocos/frameworks/cocos2d-x/tools/cocos2d-console"
         },
         {
             "from": "x-templates",
-            "to": "gen/cocos2d-x/templates",
+            "to": "gen/cocos/frameworks/cocos2d-x/templates",
             "exclude": [
                 "lua-template-default/*"
             ]
         }
     ],
     "android_mks" : [
-        "external/Box2D/Android.mk",
-        "cocos/editor-support/cocosbuilder/Android.mk",
-        "extensions/Android.mk",
-        "cocos/ui/Android.mk",
-        "external/chipmunk/Android.mk",
-        "cocos/audio/android/Android.mk",
-        "cocos/scripting/lua-bindings/Android.mk",
-        "cocos/Android.mk",
-        "cocos/editor-support/cocostudio/Android.mk",
-        "cocos/network/Android.mk",
-        "cocos/platform/android/Android.mk",
-        "cocos/editor-support/spine/Android.mk"
+        "gen/cocos/frameworks/cocos2d-x/external/Box2D/Android.mk",
+        "gen/cocos/frameworks/cocos2d-x/cocos/editor-support/cocosbuilder/Android.mk",
+        "gen/cocos/frameworks/cocos2d-x/extensions/Android.mk",
+        "gen/cocos/frameworks/cocos2d-x/cocos/ui/Android.mk",
+        "gen/cocos/frameworks/cocos2d-x/external/chipmunk/Android.mk",
+        "gen/cocos/frameworks/cocos2d-x/cocos/audio/android/Android.mk",
+        "gen/cocos/frameworks/cocos2d-x/cocos/scripting/lua-bindings/Android.mk",
+        "gen/cocos/frameworks/cocos2d-x/cocos/Android.mk",
+        "gen/cocos/frameworks/cocos2d-x/cocos/editor-support/cocostudio/Android.mk",
+        "gen/cocos/frameworks/cocos2d-x/cocos/network/Android.mk",
+        "gen/cocos/frameworks/cocos2d-x/cocos/platform/android/Android.mk",
+        "gen/cocos/frameworks/cocos2d-x/cocos/editor-support/spine/Android.mk"
     ],
     "xcode_proj_info" : {
         "cocos2d-x/build/cocos2d_libs.xcodeproj" : {
-            "outputdir" : "gen/cocos2d-x/prebuilt",
+            "outputdir" : "gen/cocos/frameworks/cocos2d-x/prebuilt",
             "targets" :[ "build all libs" ]
         },
         "cocos2d-x/cocos/scripting/lua-bindings/proj.ios_mac/cocos2d_lua_bindings.xcodeproj" : {
-            "outputdir" : "gen/cocos2d-x/prebuilt",
+            "outputdir" : "gen/cocos/frameworks/cocos2d-x/prebuilt",
             "targets" : [ "luabindings" ]
         }
     },
     "win32_proj_info" : {
         "cocos2d-x/build/cocos2d-win32.vc2012.sln" : {
-            "outputdir" : "gen/cocos2d-x/prebuilt/win32",
+            "outputdir" : "gen/cocos/frameworks/cocos2d-x/prebuilt/win32",
             "targets" : [
                 "libAudio", "libBox2D", "libchipmunk",
                 "libcocos2d", "libCocosBuilder", "libCocosStudio",
