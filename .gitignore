@@ -5,6 +5,8 @@ tools/.idea/*
 gen/*
 tools/build/*
 *.pyc
+cocos2d-x/*
+cocos2d-js/*
 
 # Ignore files build by xcode
 *.mode*v*
@@ -18,3 +20,4 @@ xcschememanagement.plist
 ._.*
 xcuserdata/
 DerivedData/
+tools/for-installer/installer-proj-mac/plugins/AndroidPaths/Build/*

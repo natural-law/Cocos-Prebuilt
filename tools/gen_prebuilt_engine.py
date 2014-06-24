@@ -27,6 +27,8 @@ ANDROID_A_PATH = "frameworks/runtime-src/proj.android/obj/local"
 MK_PATH = "frameworks/runtime-src/proj.android/jni/Application.mk"
 CONSOLE_PATH = "tools/cocos2d-console/bin"
 
+MAKE_PKG_TOOL_PATH = "tools/make-package/git-archive-all"
+
 def os_is_win32():
     return sys.platform == 'win32'
 
@@ -41,6 +43,40 @@ def run_shell(cmd, cwd=None):
         raise subprocess.CalledProcessError(returncode=p.returncode, cmd=cmd)
 
     return p.returncode
+
+def unzip(source_filename, dest_dir):
+    import zipfile
+    z = zipfile.ZipFile(source_filename)
+    for info in z.infolist():
+        name = info.filename
+
+        # don't extract absolute paths or ones with .. in them
+        if name.startswith('/') or '..' in name:
+            continue
+
+        target = os.path.join(dest_dir, *name.split('/'))
+        if not target:
+            continue
+        if name.endswith('/'):
+            # directory
+            if not os.path.exists(target):
+                os.makedirs(target)
+        else:
+            # file
+            data = z.read(info.filename)
+            file_dir = os.path.dirname(target)
+            if not os.path.exists(file_dir):
+                os.makedirs(file_dir)
+            f = open(target,'wb')
+            try:
+                f.write(data)
+            finally:
+                f.close()
+                del data
+        unix_attributes = info.external_attr >> 16
+        if unix_attributes:
+            os.chmod(target, unix_attributes)
+    z.close()
 
 class Generator(object):
 
@@ -62,6 +98,14 @@ class Generator(object):
         self.no_android = args.no_android
         self.use_incredibuild = args.use_incredibuild
 
+        self.x_repo_path = args.x_repo_path
+        self.js_repo_path = args.js_repo_path
+
+        if self.x_repo_path is not None:
+            self.gen_engine_from_repo(self.x_repo_path, "cocos2d-x")
+        elif not os.path.exists(os.path.join(self.root_dir, "cocos2d-x")):
+            raise Exception("cocos2d-x is not existed, please specify cocos2d-x repo path by \"-x\".")
+
         self.load_config()
 
     def load_config(self):
@@ -74,6 +118,34 @@ class Generator(object):
         self.android_mks = cfg_info[Generator.KEY_ANDROID_MKS]
         self.xcode_proj_info = cfg_info[Generator.KEY_XCODE_PROJ_INFO]
         self.win32_proj_info = cfg_info[Generator.KEY_WIN32_PROJ_INFO]
+
+    def gen_engine_from_repo(self, repo_dir, repo_name):
+        # get the make-package tool
+        tool_path = os.path.join(repo_dir, MAKE_PKG_TOOL_PATH)
+        if not os.path.isfile(tool_path):
+            print("\tCan't find the make-package tool")
+            return
+
+        zip_path = os.path.join(self.root_dir, "%s.zip" % repo_name)
+        if os.path.isfile(zip_path):
+            os.remove(zip_path)
+
+        # run the tool
+        print("> Generating the zip file")
+        tool_dir_name = os.path.dirname(tool_path)
+        cmd = "\"%s\" \"%s\"" % (tool_path, zip_path)
+        run_shell(cmd, tool_dir_name)
+        print("> Generate succeed!")
+
+        # unzip the file
+        print("> Unzip the file")
+        unzip(zip_path, self.root_dir)
+        print("> Unzip succeed!")
+
+        # remove the zip file
+        print("> Remove the zip file")
+        os.remove(zip_path)
+        print("> Remove succeed!")
 
     def copy_files(self):
         for cfg in self.copy_cfg:
@@ -358,6 +430,8 @@ if __name__ == "__main__":
     parser.add_argument('-c', dest='need_clean', action="store_true", help='Remove the \"gen/cocos/frameworks\" directory first, and copy files again.')
     parser.add_argument('-n', "--no-android", dest='no_android', action="store_true", help='Not build android so.')
     parser.add_argument('-i', "--incredibuild", dest='use_incredibuild', action="store_true", help='Use incredibuild to build win32 projects. Only available on windows.')
+    parser.add_argument('-x', "--cocos2dx", dest='x_repo_path', help='Set the repo path of cocos2d-x.')
+    parser.add_argument('-j', "--cocos2djs", dest='js_repo_path', help='Set the repo path of cocos2d-js.')
     (args, unknown) = parser.parse_known_args()
 
     if len(unknown) > 0:
