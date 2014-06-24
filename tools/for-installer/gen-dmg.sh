@@ -7,7 +7,7 @@ WIN_WIDTH=770
 WIN_HEIGHT=410
 
 BASEDIR="$( cd "$( dirname "$0" )" && pwd )"
-RELEASE_DIR="${BASEDIR}/../release"
+RELEASE_DIR="${BASEDIR}/../../release"
 PKG_FILE_PATH="${RELEASE_DIR}/${PROJ_NAME}.pkg"
 
 #check if the app is exist
@@ -18,7 +18,7 @@ fi
 
 TARGET_NAME="${PROJ_NAME}.dmg"
 TMP_DIR="/tmp/${PROJ_NAME}"
-RES_DIR="${BASEDIR}/../installer-proj-mac/resources"
+RES_DIR="${BASEDIR}/installer-proj-mac/resources"
 
 if [ -d "${TMP_DIR}" ]; then
     rm -rf "${TMP_DIR}"

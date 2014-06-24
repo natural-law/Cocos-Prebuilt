@@ -79,7 +79,7 @@
 									<key>Path Type</key>
 									<integer>2</integer>
 									<key>Privileges</key>
-									<integer>493</integer>
+									<integer>511</integer>
 									<key>Type</key>
 									<integer>3</integer>
 									<key>UID</key>
@@ -439,7 +439,7 @@
 						<key>Path Type</key>
 						<integer>2</integer>
 						<key>Status</key>
-						<false/>
+						<true/>
 					</dict>
 					<key>IFInstallationScriptsPostinstall</key>
 					<dict>
@@ -561,7 +561,7 @@
 		<key>10.1 Compatibility</key>
 		<true/>
 		<key>Build Path</key>
-		<string>../release</string>
+		<string>../../../release</string>
 		<key>Build Path Type</key>
 		<integer>2</integer>
 		<key>Comment</key>
