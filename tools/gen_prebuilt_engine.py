@@ -22,29 +22,10 @@ from argparse import ArgumentParser
 if sys.platform == 'win32':
     import _winreg
 
-XCODE_PROJ_INFO = {
-    "cocos2d-x/build/cocos2d_libs.xcodeproj" : [ "build all libs" ],
-    "cocos2d-x/cocos/scripting/lua-bindings/proj.ios_mac/cocos2d_lua_bindings.xcodeproj" : [ "luabindings" ]
-}
-
-X_IOS_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/ios"
-X_MAC_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/mac"
-X_WIN32_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/win32"
-X_ANDROID_OUTPUT_DIR = "gen/cocos2d-x/prebuilt/android"
-
 ANDROID_SO_PATH = "frameworks/runtime-src/proj.android/libs"
 ANDROID_A_PATH = "frameworks/runtime-src/proj.android/obj/local"
 MK_PATH = "frameworks/runtime-src/proj.android/jni/Application.mk"
 CONSOLE_PATH = "tools/cocos2d-console/bin"
-
-WIN32_PROJ_INFO = {
-    "cocos2d-x/build/cocos2d-win32.vc2012.sln" : [
-        "libAudio", "libBox2D", "libchipmunk",
-        "libcocos2d", "libCocosBuilder", "libCocosStudio",
-        "libExtensions", "libGUI", "libLocalStorage",
-        "liblua", "libNetwork", "libSpine"
-    ]
-}
 
 def os_is_win32():
     return sys.platform == 'win32'
@@ -53,20 +34,6 @@ def os_is_mac():
     return sys.platform == 'darwin'
 
 def run_shell(cmd, cwd=None):
-    """
-    Runs shell command.
-
-    @type cmd:  string
-    @param cmd: Command to be executed.
-
-    @type cwd:  string
-    @param cwd: Working directory.
-
-    @rtype:     int
-    @return:    Return code of the command.
-
-    @raise CalledProcessError:  Raises exception if return code of the command is non-zero.
-    """
     p = subprocess.Popen(cmd, shell=True, cwd=cwd)
     p.wait()
 
@@ -75,30 +42,38 @@ def run_shell(cmd, cwd=None):
 
     return p.returncode
 
-class GenerateError(Exception):
-    pass
-
 class Generator(object):
 
     XCODE_CMD_FMT = "xcodebuild -project \"%s\" -configuration Release -target \"%s\" %s CONFIGURATION_BUILD_DIR=%s"
-    COPY_CFG_FILE = "copy_config.json"
-    ANDROID_LIBS_CFG = "android_mks.json"
+
+    CONFIG_FILE = "gen_config.json"
+    KEY_COPY_CFG = "copy_config"
+    KEY_ANDROID_MKS = "android_mks"
+    KEY_XCODE_PROJ_INFO = "xcode_proj_info"
+    KEY_WIN32_PROJ_INFO = "win32_proj_info"
+
+    KEY_OUTPUT_DIR = "outputdir"
+    KEY_TARGETS = "targets"
 
     def __init__(self, args):
         self.tool_dir = os.path.realpath(os.path.dirname(__file__))
         self.root_dir = os.path.join(self.tool_dir, os.path.pardir)
-        self.copy_cfg = self.load_copy_cfg()
         self.need_clean = args.need_clean
         self.no_android = args.no_android
         self.use_incredibuild = args.use_incredibuild
 
-    def load_copy_cfg(self):
-        cfg_json = os.path.join(self.tool_dir, Generator.COPY_CFG_FILE)
+        self.load_config()
+
+    def load_config(self):
+        cfg_json = os.path.join(self.tool_dir, Generator.CONFIG_FILE)
         f = open(cfg_json)
         cfg_info = json.load(f)
         f.close()
 
-        return cfg_info
+        self.copy_cfg = cfg_info[Generator.KEY_COPY_CFG]
+        self.android_mks = cfg_info[Generator.KEY_ANDROID_MKS]
+        self.xcode_proj_info = cfg_info[Generator.KEY_XCODE_PROJ_INFO]
+        self.win32_proj_info = cfg_info[Generator.KEY_WIN32_PROJ_INFO]
 
     def copy_files(self):
         for cfg in self.copy_cfg:
@@ -113,10 +88,11 @@ class Generator(object):
     def build_android(self, language):
         # build .so for android
         if language == "js":
-            engine_dir = os.path.join(self.root_dir, "cocos2d-js")
+            engine_name = "cocos2d-js"
         else:
-            engine_dir = os.path.join(self.root_dir, "cocos2d-x")
+            engine_name = "cocos2d-x"
 
+        engine_dir = os.path.join(self.root_dir, engine_name)
         console_dir = os.path.join(engine_dir, CONSOLE_PATH)
         cmd_path = os.path.join(console_dir, "cocos")
         proj_name = "My%sGame" % language
@@ -145,7 +121,7 @@ class Generator(object):
 
         # copy .a to prebuilt dir
         obj_dir = os.path.join(proj_path, ANDROID_A_PATH)
-        prebuilt_dir = os.path.join(self.root_dir, X_ANDROID_OUTPUT_DIR)
+        prebuilt_dir = os.path.join(self.root_dir, "gen", engine_name, "prebuilt", "android")
         copy_cfg = {
             "from": obj_dir,
             "to": prebuilt_dir,
@@ -156,12 +132,8 @@ class Generator(object):
         excopy.copy_files_with_config(copy_cfg, obj_dir, prebuilt_dir)
 
         # modify the mk files to prebuilt version
-        android_mks_json = os.path.join(self.tool_dir, Generator.ANDROID_LIBS_CFG)
-        f = open(android_mks_json)
-        mk_files = json.load(f)
-        f.close()
         import gen_prebuilt_mk
-        for mk_file in mk_files:
+        for mk_file in self.android_mks:
             mk_file_path = os.path.join(self.root_dir, "gen", "cocos2d-x", mk_file)
             tmp_obj = gen_prebuilt_mk.MKGenerator(mk_file_path, prebuilt_dir, mk_file_path)
             tmp_obj.do_generate()
@@ -197,7 +169,7 @@ class Generator(object):
         # get required vs version
         required_vs_version = self.get_required_vs_version(proj_path)
         if required_vs_version is None:
-            raise GenerateError("Can't parse the sln file to find required VS version")
+            raise Exception("Can't parse the sln file to find required VS version")
 
         # get the correct available VS path
         needUpgrade = False
@@ -224,7 +196,7 @@ class Generator(object):
 
         if vsPath is None:
             message = "Can't find correct Visual Studio's path in the regedit"
-            raise GenerateError(message)
+            raise Exception(message)
 
         commandPath = os.path.join(vsPath, "Common7", "IDE", "devenv")
         return (commandPath, needUpgrade)
@@ -271,9 +243,10 @@ class Generator(object):
 
         except WindowsError:
             message = "Visual Studio wasn't installed"
-            raise GenerateError(message)
+            raise Exception(message)
 
-        for key in WIN32_PROJ_INFO.keys():
+        for key in self.win32_proj_info.keys():
+            output_dir = self.win32_proj_info[key][Generator.KEY_OUTPUT_DIR]
             proj_path = os.path.join(self.root_dir, key)
             vs_command, needUpgrade = self.get_vs_cmd_path(vs_reg, proj_path)
 
@@ -288,7 +261,7 @@ class Generator(object):
                 shutil.rmtree(build_folder_path)
             os.makedirs(build_folder_path)
 
-            win32_output_dir = os.path.join(self.root_dir, X_WIN32_OUTPUT_DIR)
+            win32_output_dir = os.path.join(self.root_dir, output_dir)
             if os.path.exists(win32_output_dir):
                 shutil.rmtree(win32_output_dir)
             os.makedirs(win32_output_dir)
@@ -302,7 +275,7 @@ class Generator(object):
                 ])
                 run_shell(commandUpgrade)
 
-            for proj_name in WIN32_PROJ_INFO[key]:
+            for proj_name in self.win32_proj_info[key][Generator.KEY_TARGETS]:
                 # build the projects
                 self.build_win32_proj(cmd_path, proj_path, proj_name, "build")
 
@@ -312,7 +285,7 @@ class Generator(object):
                     self.build_win32_proj(cmd_path, proj_path, proj_name, "rebuild")
 
                 if not os.path.exists(lib_file_path):
-                    raise GenerateError("Library %s not generated as expected!" % lib_file_path)
+                    raise Exception("Library %s not generated as expected!" % lib_file_path)
 
             # copy the libs into prebuilt dir
             for file_name in os.listdir(build_folder_path):
@@ -322,39 +295,36 @@ class Generator(object):
         print("Win32 build succeeded.")
 
     def build_ios_mac(self):
-        x_ios_out_dir = os.path.join(self.root_dir, X_IOS_OUTPUT_DIR)
-        x_mac_out_dir = os.path.join(self.root_dir, X_MAC_OUTPUT_DIR)
-        if os.path.exists(x_ios_out_dir):
-            shutil.rmtree(x_ios_out_dir)
-        if os.path.exists(x_mac_out_dir):
-            shutil.rmtree(x_mac_out_dir)
-
-        x_ios_sim_libs_dir = os.path.join(x_ios_out_dir, "simulator")
-        x_ios_dev_libs_dir = os.path.join(x_ios_out_dir, "device")
-        for key in XCODE_PROJ_INFO.keys():
+        for key in self.xcode_proj_info.keys():
+            output_dir = self.xcode_proj_info[key][Generator.KEY_OUTPUT_DIR]
             proj_path = os.path.join(self.root_dir, key)
-            for target in XCODE_PROJ_INFO[key]:
-                build_cmd = Generator.XCODE_CMD_FMT % (proj_path, "%s iOS" % target, "-sdk iphonesimulator", x_ios_sim_libs_dir)
+            ios_out_dir = os.path.join(self.root_dir, output_dir, "ios")
+            mac_out_dir = os.path.join(self.root_dir, output_dir, "mac")
+
+            ios_sim_libs_dir = os.path.join(ios_out_dir, "simulator")
+            ios_dev_libs_dir = os.path.join(ios_out_dir, "device")
+            for target in self.xcode_proj_info[key][Generator.KEY_TARGETS]:
+                build_cmd = Generator.XCODE_CMD_FMT % (proj_path, "%s iOS" % target, "-sdk iphonesimulator", ios_sim_libs_dir)
                 run_shell(build_cmd, self.tool_dir)
 
-                build_cmd = Generator.XCODE_CMD_FMT % (proj_path, "%s iOS" % target, "-sdk iphoneos", x_ios_dev_libs_dir)
+                build_cmd = Generator.XCODE_CMD_FMT % (proj_path, "%s iOS" % target, "-sdk iphoneos", ios_dev_libs_dir)
                 run_shell(build_cmd, self.tool_dir)
 
-                build_cmd = Generator.XCODE_CMD_FMT % (proj_path, "%s Mac" % target, "", x_mac_out_dir)
+                build_cmd = Generator.XCODE_CMD_FMT % (proj_path, "%s Mac" % target, "", mac_out_dir)
                 run_shell(build_cmd, self.tool_dir)
 
-        # generate fat libs for iOS
-        for lib in os.listdir(x_ios_sim_libs_dir):
-            sim_lib = os.path.join(x_ios_sim_libs_dir, lib)
-            dev_lib = os.path.join(x_ios_dev_libs_dir, lib)
-            output_lib = os.path.join(x_ios_out_dir, lib)
-            lipo_cmd = "lipo -create -output \"%s\" \"%s\" \"%s\"" % (output_lib, sim_lib, dev_lib)
+            # generate fat libs for iOS
+            for lib in os.listdir(ios_sim_libs_dir):
+                sim_lib = os.path.join(ios_sim_libs_dir, lib)
+                dev_lib = os.path.join(ios_dev_libs_dir, lib)
+                output_lib = os.path.join(ios_out_dir, lib)
+                lipo_cmd = "lipo -create -output \"%s\" \"%s\" \"%s\"" % (output_lib, sim_lib, dev_lib)
 
-            run_shell(lipo_cmd)
+                run_shell(lipo_cmd)
 
-        # remove the simulator & device libs in iOS
-        shutil.rmtree(x_ios_sim_libs_dir)
-        shutil.rmtree(x_ios_dev_libs_dir)
+            # remove the simulator & device libs in iOS
+            shutil.rmtree(ios_sim_libs_dir)
+            shutil.rmtree(ios_dev_libs_dir)
 
     def build_all_libs(self):
         if os_is_mac():
@@ -380,11 +350,6 @@ class Generator(object):
 
             # copy the necessary files
             self.copy_files()
-
-            # create win32 directory
-            win32_dir = os.path.join(self.root_dir, X_WIN32_OUTPUT_DIR)
-            if not os.path.exists(win32_dir):
-                os.makedirs(win32_dir)
 
         self.build_all_libs()
 
