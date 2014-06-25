@@ -219,8 +219,12 @@ class Generator(object):
     def build_so_for_anysdk(self, language):
         if language == "js":
             engine_name = "cocos2d-js"
+            proj_name = "PrebuiltRuntimeJs"
+            pkg_name = "org.cocos2dx.PrebuiltRuntimeJs"
         else:
             engine_name = "cocos2d-x"
+            proj_name = "PrebuiltRuntimeLua"
+            pkg_name = "org.cocos2dx.PrebuiltRuntimeLua"
 
         # copy to tmp dir
         import tempfile
@@ -233,20 +237,19 @@ class Generator(object):
 
         console_dir = os.path.join(tmp_dir, CONSOLE_PATH)
         cmd_path = os.path.join(console_dir, "cocos")
-        proj_name = "My%sGame" % language
         proj_path = os.path.join(tmp_dir, proj_name)
         if os.path.exists(proj_path):
             shutil.rmtree(proj_path)
 
         # create a runtime project
-        create_cmd = "%s new -l %s -t runtime -d %s %s" % (cmd_path, language, tmp_dir, proj_name)
+        create_cmd = "%s new -l %s -t runtime -p %s -d %s %s" % (cmd_path, language, pkg_name, tmp_dir, proj_name)
         run_shell(create_cmd)
 
         # Add multi ABI in Application.mk
         mk_file = os.path.join(proj_path, MK_PATH)
         self.modify_mk(mk_file)
 
-        # build it
+        # build it with release mode to get the so file
         build_cmd = "%s compile -s %s -p android --ndk-mode release -j 4" % (cmd_path, proj_path)
         run_shell(build_cmd)
 
@@ -256,6 +259,18 @@ class Generator(object):
         if os.path.exists(target_libs_dir):
             shutil.rmtree(target_libs_dir)
         shutil.copytree(libs_dir, target_libs_dir)
+
+        # build it with debug mode to get the prebuilt apk
+        build_cmd = "%s compile -s %s -p android --no-res -j 4" % (cmd_path, proj_path)
+        run_shell(build_cmd)
+
+        # copy the apk into template dir
+        apk_dir = os.path.join(proj_path, "runtime", "android", "%s-debug.apk" % proj_name)
+        target_apk_path = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "templates", "%s-template-runtime" % language, "runtime", "android", "%s.apk" % proj_name)
+        if os.path.exists(target_apk_path):
+            os.remove(target_apk_path)
+        shutil.copy(apk_dir, os.path.dirname(target_apk_path))
+        os.rename(os.path.join(os.path.dirname(target_apk_path), "%s-debug.apk" % proj_name), target_apk_path)
 
         # remove the temp dir
         shutil.rmtree(tmp_dir)
