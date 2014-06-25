@@ -16,7 +16,7 @@ void cocos_android_app_init (JNIEnv* env, jobject thiz) {
     AppDelegate *pAppDelegate = new AppDelegate();
     JavaVM* vm;
     env->GetJavaVM(&vm);
-    PluginJniHelper::setJavaVM(vm);
+    anysdk::framework::PluginJniHelper::setJavaVM(vm);
 }
 
 extern "C"

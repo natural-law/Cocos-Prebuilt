@@ -213,6 +213,53 @@ class Generator(object):
         # remove the project
         shutil.rmtree(proj_path)
 
+        # build so with anysdk for runtime template
+        self.build_so_for_anysdk(language)
+
+    def build_so_for_anysdk(self, language):
+        if language == "js":
+            engine_name = "cocos2d-js"
+        else:
+            engine_name = "cocos2d-x"
+
+        # copy to tmp dir
+        import tempfile
+        tmp_dir = os.path.join(tempfile.gettempdir(), engine_name)
+        if os.path.exists(tmp_dir):
+            shutil.rmtree(tmp_dir)
+        shutil.copytree(os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name), tmp_dir)
+
+        print("temp dir is %s" % tmp_dir)
+
+        console_dir = os.path.join(tmp_dir, CONSOLE_PATH)
+        cmd_path = os.path.join(console_dir, "cocos")
+        proj_name = "My%sGame" % language
+        proj_path = os.path.join(tmp_dir, proj_name)
+        if os.path.exists(proj_path):
+            shutil.rmtree(proj_path)
+
+        # create a runtime project
+        create_cmd = "%s new -l %s -t runtime -d %s %s" % (cmd_path, language, tmp_dir, proj_name)
+        run_shell(create_cmd)
+
+        # Add multi ABI in Application.mk
+        mk_file = os.path.join(proj_path, MK_PATH)
+        self.modify_mk(mk_file)
+
+        # build it
+        build_cmd = "%s compile -s %s -p android --ndk-mode release -j 4" % (cmd_path, proj_path)
+        run_shell(build_cmd)
+
+        # copy .so to the template dir
+        libs_dir = os.path.join(proj_path, ANDROID_SO_PATH)
+        target_libs_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "templates", "%s-template-runtime" % language, ANDROID_SO_PATH)
+        if os.path.exists(target_libs_dir):
+            shutil.rmtree(target_libs_dir)
+        shutil.copytree(libs_dir, target_libs_dir)
+
+        # remove the temp dir
+        shutil.rmtree(tmp_dir)
+
     def get_required_vs_version(self, proj_file):
         # get the VS version required by the project
         import re
@@ -422,6 +469,11 @@ class Generator(object):
 
             # copy the necessary files
             self.copy_files()
+
+            # create win32 directory
+            win32_dir = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-x/prebuilt/win32")
+            if not os.path.exists(win32_dir):
+                os.makedirs(win32_dir)
 
         self.build_all_libs()
 

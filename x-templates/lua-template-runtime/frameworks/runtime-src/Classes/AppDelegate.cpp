@@ -8,7 +8,6 @@
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 #include "anysdkbindings.hpp"
 #include "anysdk_manual_bindings.hpp"
-using namespace anysdk::framework;
 #endif
 
 using namespace CocosDenshion;

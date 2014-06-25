@@ -61,6 +61,7 @@ static int tolua_anysdk_protocol_callFuncWithParam(lua_State* tolua_S)
         arg0 = arg0_tmp.c_str();
 
         std::vector<PluginParam*> params;
+ #if COCOS2D_DEBUG >= 1
         if (!tolua_istable(tolua_S, 3, 0, &tolua_err))
         {
             CCLOG("is not usertable");
@@ -96,6 +97,7 @@ static int tolua_anysdk_protocol_callFuncWithParam(lua_State* tolua_S)
                 lua_pop(tolua_S, 1);
             }
         }
+#endif
         cobj->callFuncWithParam(arg0, params);
         return 0;
     }
@@ -148,6 +150,7 @@ static int tolua_anysdk_ProtocolPush_setTags(lua_State* tolua_S)
     argc = lua_gettop(tolua_S)-1;
     if (argc == 1)
     {
+#if COCOS2D_DEBUG >= 1
         if( tolua_istable(tolua_S, 2, 0, &tolua_err) )
         {
             size_t len = lua_objlen(tolua_S, 2);
@@ -177,6 +180,7 @@ static int tolua_anysdk_ProtocolPush_setTags(lua_State* tolua_S)
         else{
             CCLOG("%s has wrong type of arguments.", "setTags");
         }
+#endif
         return 0;
     }
 
@@ -217,6 +221,7 @@ static int tolua_anysdk_ProtocolPush_delTags(lua_State* tolua_S)
     argc = lua_gettop(tolua_S)-1;
     if (argc == 1)
     {
+#if COCOS2D_DEBUG >= 1
         if( tolua_istable(tolua_S, 2, 0, &tolua_err) )
         {
             size_t len = lua_objlen(tolua_S, 2);
@@ -246,6 +251,7 @@ static int tolua_anysdk_ProtocolPush_delTags(lua_State* tolua_S)
         else{
             CCLOG("%s has wrong type of arguments.", "delTags");
         }
+#endif
         return 0;
     }
 
@@ -402,6 +408,7 @@ static int tolua_anysdk_ProtocolIAP_payForProduct(lua_State* tolua_S)
     CCLOG("in pay product, argc: %d.", argc);
     if (argc == 1)
     {
+#if COCOS2D_DEBUG >= 1
         if (tolua_istable(tolua_S, 2, 0, &tolua_err))
         {
             CCLOG("is table");
@@ -430,6 +437,7 @@ static int tolua_anysdk_ProtocolIAP_payForProduct(lua_State* tolua_S)
             cobj->payForProduct(strmap);
             CCLOG("end");
         }
+#endif
         return 0;
     }
 
@@ -680,6 +688,7 @@ static int tolua_anysdk_ProtocolSocial_unlockAchievement(lua_State* tolua_S)
     CCLOG("in set unlockAchievement, argc: %d.", argc);
     if (argc == 1)
     {
+#if COCOS2D_DEBUG >= 1
         if (tolua_istable(tolua_S, 2, 0, &tolua_err))
         {
             CCLOG("is table");
@@ -708,6 +717,7 @@ static int tolua_anysdk_ProtocolSocial_unlockAchievement(lua_State* tolua_S)
 
             CCLOG("set unlockAchievement end");
         }
+#endif
 
         return 0;
     }
@@ -778,6 +788,7 @@ int tolua_anysdk_ProtocolAnalytics_logEvent(lua_State* tolua_S)
 
         if(!ok)
             return 0;
+#if COCOS2D_DEBUG >= 1
         if (tolua_istable(tolua_S, 3, 0, &tolua_err))
         {
             CCLOG("is table");
@@ -805,6 +816,7 @@ int tolua_anysdk_ProtocolAnalytics_logEvent(lua_State* tolua_S)
             }
             cobj->logEvent(arg0, strmap);
         }
+#endif
         return 0;
     }
     CCLOG("%s has wrong number of arguments: %d, was expecting %d \n", "logEvent",argc, 1);
@@ -1022,6 +1034,7 @@ int lua_anysdkbindings_PluginParam_PluginParam(lua_State* tolua_S)
     {
         if(!ok)
             return 0;
+#if COCOS2D_DEBUG >= 1
         if(tolua_isboolean(tolua_S, 2, 0, &tolua_err))
         {
             bool arg1 = (bool)tolua_toboolean(tolua_S, 2, 0);
@@ -1075,6 +1088,7 @@ int lua_anysdkbindings_PluginParam_PluginParam(lua_State* tolua_S)
             cobj = new PluginParam(strmap);
             CCLOG("end");
         }
+#endif
 
         if(nullptr != cobj)
         {
@@ -1526,6 +1540,7 @@ int lua_anysdkbindings_ProtocolShare_share(lua_State* tolua_S)
     argc = lua_gettop(tolua_S)-1;
     if (argc == 1) 
     {
+#if COCOS2D_DEBUG >= 1
         if (tolua_istable(tolua_S, 2, 0, &tolua_err))
         {
             CCLOG("is table");
@@ -1553,6 +1568,7 @@ int lua_anysdkbindings_ProtocolShare_share(lua_State* tolua_S)
             cobj->share(strmap);
             CCLOG("end");
         }
+#endif
         return 0;
     }
     CCLOG("%s has wrong number of arguments: %d, was expecting %d \n", "share",argc, 1);
