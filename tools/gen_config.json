@@ -1,19 +1,66 @@
 {
     "copy_config" : [
         {
-            "from": "cocos2d-x",
-            "to": "gen/cocos/frameworks/cocos2d-x",
+            "from": "cocos2d-x/cocos",
+            "to": "gen/cocos/frameworks/cocos2d-x/cocos",
             "include": [
-                "cocos/*Android.mk$",
-                "cocos/*.h$",
-                "cocos/math/*.inl$",
-                "cocos/*.props$",
-                "extensions/*.h$",
-                "extensions/Android.mk",
-                "external/*.h$",
-                "external/*/Android.mk$",
-                "external/*/prebuilt/android/*.a$",
-                "external/lua/luasocket/*.lua$"
+                "editor-support/*/Android.mk",
+                "ui/Android.mk",
+                "audio/android/Android.mk",
+                "scripting/lua-bindings/Android.mk",
+                "Android.mk",
+                "network/Android.mk",
+                "platform/android/Android.mk",
+                "cocos2d.h",
+                "2d/*.h$",
+                "2d/*.props$",
+                "3d/*.h$",
+                "audio/include/*.h",
+                "base/*.h",
+                "deprecated/*.h",
+                "editor-support/*.h",
+                "math/*.h",
+                "math/*.inl",
+                "network/*.h",
+                "physics/*.h",
+                "platform/*.h",
+                "renderer/*.h",
+                "scripting/*.h",
+                "storage/*.h$",
+                "ui/*.h"
+            ]
+        },
+        {
+            "from": "cocos2d-x/extensions",
+            "to": "gen/cocos/frameworks/cocos2d-x/extensions",
+            "include": [
+                "Android.mk",
+                "cocos-ext.h",
+                "ExtensionMacros.h",
+                "assets-manager/*.h",
+                "GUI/*.h",
+                "physics-nodes/*.h"
+            ]
+        },
+        {
+            "from": "cocos2d-x/external",
+            "to": "gen/cocos/frameworks/cocos2d-x/external",
+            "include": [
+                "*/Android.mk",
+                "curl/prebuilt/android/*.a",
+                "freetype2/prebuilt/android/*.a",
+                "jpeg/prebuilt/android/*.a",
+                "png/prebuilt/android/*.a",
+                "tiff/prebuilt/android/*.a",
+                "webp/prebuilt/android/*.a",
+                "websockets/prebuilt/android/*.a",
+                "Box2D/*.h",
+                "chipmunk/include/*.h",
+                "glfw3/include/*.h",
+                "json/*.h",
+                "lua/tolua/*.h",
+                "lua/luajit/include/*.h",
+                "lua/luasocket/*.lua$"
             ]
         },
         {
@@ -34,7 +81,13 @@
         },
         {
             "from": "cocos2d-x/tools/cocos2d-console",
-            "to": "gen/cocos/frameworks/cocos2d-x/tools/cocos2d-console"
+            "to": "gen/cocos/frameworks/cocos2d-x/tools/cocos2d-console",
+            "exclude": [
+                "config.json",
+                "download-bin.py",
+                "version.json",
+                "*.pyc"
+            ]
         },
         {
             "from": "x-templates",
