@@ -54,6 +54,7 @@
                 "tiff/prebuilt/android/*.a",
                 "webp/prebuilt/android/*.a",
                 "websockets/prebuilt/android/*.a",
+                "lua/luajit/prebuilt/android/*.a",
                 "Box2D/*.h",
                 "chipmunk/include/*.h",
                 "glfw3/include/*.h",
