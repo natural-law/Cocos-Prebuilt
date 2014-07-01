@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<UIProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ProjectDir>.</ProjectDir>
+  <Version>1.0.0.0</Version>
+  <Resources>./Resources</Resources>
+  <Name>HelloLua</Name>
+  <JsonFileName>HelloLua.json</JsonFileName>
+  <JsonFolder>./Json</JsonFolder>
+  <JsonList>
+    <string>main.json</string>
+  </JsonList>
+  <filePath>./HelloLua.xml.ui</filePath>
+  <ProjectType>UIProject</ProjectType>
+  <ResRelativePath />
+  <imageFileList />
+  <imagePngList />
+  <JsonSuffix>.json</JsonSuffix>
+  <CurrentUIJson>main.json</CurrentUIJson>
+  <CanvasSize>
+    <Width>480</Width>
+    <Height>320</Height>
+  </CanvasSize>
+</UIProject>

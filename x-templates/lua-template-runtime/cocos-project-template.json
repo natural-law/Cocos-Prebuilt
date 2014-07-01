@@ -5,11 +5,18 @@
             "runtime/config.json",
             "runtime/version.json"
         ],
+        "project_rename": {
+            "src_project_name": "HelloLua",
+            "files": [
+                "ccs-project/PROJECT_NAME.xml.ui"
+            ]
+        },
         "project_replace_project_name": {
             "src_project_name": "HelloLua",
             "files": [
                 "config.json",
-                ".project"
+                ".project",
+                "ccs-project/PROJECT_NAME.xml.ui"
             ]
         },
         "append_dir": [

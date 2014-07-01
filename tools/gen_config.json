@@ -94,7 +94,8 @@
             "from": "x-templates",
             "to": "gen/cocos/frameworks/cocos2d-x/templates",
             "exclude": [
-                "lua-template-default/*"
+                "lua-template-default/*",
+                ".gitignore"
             ]
         }
     ],

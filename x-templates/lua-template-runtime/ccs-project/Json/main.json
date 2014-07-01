@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0.0",
+  "designWidth": 480,
+  "designHeight": 320,
+  "dataScale": 1.0,
+  "textures": [],
+  "texturesPng": [],
+  "nodeTree": {
+    "options": {
+      "$type": "EditorCommon.JsonModel.Component.GUI.RootGUISurrogate, EditorCommon",
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "visible": true,
+      "width": 0.0,
+      "height": 0.0,
+      "frameEvent": null,
+      "name": "Node",
+      "classname": "Node"
+    },
+    "children": [],
+    "name": null,
+    "classname": "Node"
+  },
+  "action": {
+    "duration": 0,
+    "speed": 1.0,
+    "timelines": null
+  },
+  "name": null,
+  "classname": null
+}
