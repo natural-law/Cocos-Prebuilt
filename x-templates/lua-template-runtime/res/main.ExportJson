@@ -3,8 +3,12 @@
   "designWidth": 480,
   "designHeight": 320,
   "dataScale": 1.0,
-  "textures": [],
-  "texturesPng": [],
+  "textures": [
+    "main.plist"
+  ],
+  "texturesPng": [
+    "main.png"
+  ],
   "nodeTree": {
     "options": {
       "$type": "EditorCommon.JsonModel.Component.GUI.RootGUISurrogate, EditorCommon",
@@ -67,7 +71,7 @@
           "sizeType": 0,
           "sizePercentX": 0.416666657,
           "sizePercentY": 0.625,
-          "useMergedTexture": false,
+          "useMergedTexture": true,
           "actionTag": 296308074,
           "tag": 39,
           "anchorPointX": 0.0,
@@ -85,7 +89,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "farm.jpg",
                 "plistFile": ""
               },
@@ -119,7 +123,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 330861482,
               "tag": 23,
               "anchorPointX": 0.5,
@@ -140,7 +144,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "land.png",
                 "plistFile": ""
               },
@@ -174,7 +178,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 926547407,
               "tag": 26,
               "anchorPointX": 0.5,
@@ -195,7 +199,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "land.png",
                 "plistFile": ""
               },
@@ -229,7 +233,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 178427354,
               "tag": 27,
               "anchorPointX": 0.5,
@@ -250,7 +254,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "land.png",
                 "plistFile": ""
               },
@@ -284,7 +288,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 1013935373,
               "tag": 28,
               "anchorPointX": 0.5,
@@ -305,7 +309,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "land.png",
                 "plistFile": ""
               },
@@ -339,7 +343,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 615931240,
               "tag": 30,
               "anchorPointX": 0.5,
@@ -360,7 +364,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "land.png",
                 "plistFile": ""
               },
@@ -394,7 +398,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 567294219,
               "tag": 31,
               "anchorPointX": 0.5,
@@ -415,7 +419,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "land.png",
                 "plistFile": ""
               },
@@ -449,7 +453,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 319548753,
               "tag": 32,
               "anchorPointX": 0.5,
@@ -470,7 +474,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "land.png",
                 "plistFile": ""
               },
@@ -504,7 +508,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 102109674,
               "tag": 33,
               "anchorPointX": 0.5,
@@ -525,7 +529,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "land.png",
                 "plistFile": ""
               },
@@ -559,7 +563,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 428288909,
               "tag": 35,
               "anchorPointX": 0.5,
@@ -580,7 +584,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "crop.png",
                 "plistFile": ""
               },
@@ -614,7 +618,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 111179319,
               "tag": 58,
               "anchorPointX": 0.5,
@@ -635,7 +639,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "crop.png",
                 "plistFile": ""
               },
@@ -669,7 +673,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 665208191,
               "tag": 59,
               "anchorPointX": 0.5,
@@ -690,7 +694,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "crop.png",
                 "plistFile": ""
               },
@@ -724,7 +728,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 747183065,
               "tag": 60,
               "anchorPointX": 0.5,
@@ -745,7 +749,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "crop.png",
                 "plistFile": ""
               },
@@ -779,7 +783,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 61640127,
               "tag": 61,
               "anchorPointX": 0.5,
@@ -800,7 +804,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "crop.png",
                 "plistFile": ""
               },
@@ -834,7 +838,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 137436621,
               "tag": 62,
               "anchorPointX": 0.5,
@@ -855,7 +859,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "crop.png",
                 "plistFile": ""
               },
@@ -889,7 +893,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 468360969,
               "tag": 63,
               "anchorPointX": 0.5,
@@ -910,7 +914,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "crop.png",
                 "plistFile": ""
               },
@@ -944,7 +948,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 460841676,
               "tag": 64,
               "anchorPointX": 0.5,
@@ -965,7 +969,7 @@
               "$type": "EditorCommon.JsonModel.Component.GUI.ImageViewSurrogate, EditorCommon",
               "fileName": null,
               "fileNameData": {
-                "resourceType": 0,
+                "resourceType": 1,
                 "path": "crop.png",
                 "plistFile": ""
               },
@@ -999,7 +1003,7 @@
               "sizeType": 0,
               "sizePercentX": 0.4,
               "sizePercentY": 0.4,
-              "useMergedTexture": false,
+              "useMergedTexture": true,
               "actionTag": 175069320,
               "tag": 57,
               "anchorPointX": 0.5,
@@ -1026,7 +1030,7 @@
           "pressed": null,
           "disabled": null,
           "normalData": {
-            "resourceType": 0,
+            "resourceType": 1,
             "path": "menu1.png",
             "plistFile": ""
           },
@@ -1077,7 +1081,7 @@
           "sizeType": 0,
           "sizePercentX": 0.214583337,
           "sizePercentY": 0.125,
-          "useMergedTexture": false,
+          "useMergedTexture": true,
           "actionTag": 458504579,
           "tag": 40,
           "anchorPointX": 0.5,
