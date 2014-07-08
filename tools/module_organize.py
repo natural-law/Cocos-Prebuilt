@@ -46,8 +46,16 @@ class ModuleOrganizer(object):
     def __init__(self, src_root, dst_root):
         self.local_path = os.path.realpath(os.path.dirname(__file__))
         self.modules_info = self._parse_modules()
-        self.src_root = src_root
-        self.dst_root = dst_root
+
+        if os.path.isabs(src_root):
+            self.src_root = src_root
+        else:
+            self.src_root = os.path.abspath(src_root)
+
+        if os.path.isabs(dst_root):
+            self.dst_root = dst_root
+        else:
+            self.dst_root = os.path.abspath(dst_root)
 
     def _parse_modules(self):
         cfg_path = os.path.join(self.local_path, ModuleOrganizer.CFG_FILE)
