@@ -3,6 +3,8 @@
         "module_type" : "compiled",
         "target_dir" : "cocos",
         "win32_lib_file_name" : "libcocos2d.lib",
+        "ios_lib_file_name" : "libcocos2dx iOS.a",
+        "mac_lib_file_name" : "libcocos2dx Mac.a",
         "android_lib_name" : "cocos2dx_static",
         "android_lib_file_name" : "libcocos2d",
         "include" : [
@@ -120,6 +122,8 @@
         "module_type" : "compiled",
         "target_dir" : "modules/chipmunk",
         "win32_lib_file_name" : "libchipmunk.lib",
+        "ios_lib_file_name" : "libchipmunk iOS.a",
+        "mac_lib_file_name" : "libchipmunk Mac.a",
         "android_lib_name" : "chipmunk_static",
         "android_lib_file_name" : "libchipmunk",
         "include" : [
@@ -139,6 +143,8 @@
         "module_type" : "compiled",
         "target_dir" : "modules/Box2D",
         "win32_lib_file_name" : "libBox2D.lib",
+        "ios_lib_file_name" : "libbox2d iOS.a",
+        "mac_lib_file_name" : "libbox2d Mac.a",
         "android_lib_name" : "box2d_static",
         "android_lib_file_name" : "libbox2d",
         "include" : [
@@ -158,6 +164,8 @@
         "module_type" : "compiled",
         "target_dir" : "modules/audio",
         "win32_lib_file_name" : "libAudio.lib",
+        "ios_lib_file_name" : "libCocosDenshion iOS.a",
+        "mac_lib_file_name" : "libCocosDenshion Mac.a",
         "android_lib_name" : "cocosdenshion_static",
         "android_lib_file_name" : "libcocosdenshion",
         "include" : [
@@ -221,6 +229,8 @@
         "module_type" : "compiled",
         "target_dir" : "modules/extensions",
         "win32_lib_file_name" : "libExtensions.lib",
+        "ios_lib_file_name" : "libcocos2dx-extensions iOS.a",
+        "mac_lib_file_name" : "libcocos2dx-extensions Mac.a",
         "android_lib_name" : "cocos_extension_static",
         "android_lib_file_name" : "libextension",
         "include" : [

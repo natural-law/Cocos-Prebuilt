@@ -24,6 +24,8 @@ class ModuleOrganizer(object):
     KEY_MODULE_EXPORT_CFLAGS = "export_cflags"
     KEY_MODULE_EXPORT_CPPFLAGS = "export_cppflags"
     KEY_MODULE_WIN32_LIB_FILE_NAME = "win32_lib_file_name"
+    KEY_MODULE_IOS_LIB_FILE_NAME = "ios_lib_file_name"
+    KEY_MODULE_MAC_LIB_FILE_NAME = "mac_lib_file_name"
 
     # Parameter 5--9 means:
     # 5. LOCAL_EXPORT_LDLIBS
@@ -155,6 +157,21 @@ class ModuleOrganizer(object):
                 os.makedirs(dst_dir)
             shutil.copy(src_lib_file, dst_dir)
 
+    def handle_for_ios_mac(self, module_info):
+        if module_info.has_key(ModuleOrganizer.KEY_MODULE_IOS_LIB_FILE_NAME):
+            dst_dir = os.path.join(self.dst_root, module_info[ModuleOrganizer.KEY_MODULE_TARGET_DIR], "prebuilt", "ios")
+            src_lib_file = os.path.join(self.src_root, "prebuilt", "ios", module_info[ModuleOrganizer.KEY_MODULE_IOS_LIB_FILE_NAME])
+            if not os.path.exists(dst_dir):
+                os.makedirs(dst_dir)
+            shutil.copy(src_lib_file, dst_dir)
+
+        if module_info.has_key(ModuleOrganizer.KEY_MODULE_MAC_LIB_FILE_NAME):
+            dst_dir = os.path.join(self.dst_root, module_info[ModuleOrganizer.KEY_MODULE_TARGET_DIR], "prebuilt", "mac")
+            src_lib_file = os.path.join(self.src_root, "prebuilt", "mac", module_info[ModuleOrganizer.KEY_MODULE_MAC_LIB_FILE_NAME])
+            if not os.path.exists(dst_dir):
+                os.makedirs(dst_dir)
+            shutil.copy(src_lib_file, dst_dir)
+
     def gen_compiled_module(self, module_name):
         print("gen compiled module : %s" % module_name)
         module_info = self.modules_info[module_name]
@@ -168,6 +185,9 @@ class ModuleOrganizer(object):
 
         # handle the process for win32
         self.handle_for_win32(module_info)
+
+        # handle the process for ios and mac
+        self.handle_for_ios_mac(module_info)
 
     def gen_prebuilt_module(self, module_name):
         print("gen prebuilt module : %s" % module_name)
