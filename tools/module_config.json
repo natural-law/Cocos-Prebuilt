@@ -15,7 +15,7 @@
                     "2d/*.h", "3d/*.h", "3d/*.inl", "base/*.h",
                     "deprecated/*.h", "math/*.h", "math/*.inl",
                     "physics/*.h", "platform/*.h", "renderer/*.h",
-                    "storage/*.h", "*.h", "2d/*.props"
+                    "storage/*.h", "cocos2d.h", "2d/*.props"
                 ]
             },
             {
@@ -190,7 +190,7 @@
         "include" : [
             {
                 "from": "cocos/network",
-                "to": "modules/network/include",
+                "to": "modules/network/include/network",
                 "include" : [
                     "*.h"
                 ]
@@ -212,7 +212,7 @@
         "include" : [
             {
                 "from": "cocos/ui",
-                "to": "modules/ui/include",
+                "to": "modules/ui/include/ui",
                 "include" : [
                     "*.h"
                 ]
