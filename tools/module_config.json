@@ -36,6 +36,7 @@
         ],
         "export_include" : [
             "../../include",
+            "../../../modules",
             "../../../external/tinyxml2",
             "../../../external/unzip",
             "../../../external/chipmunk/include/chipmunk",
