@@ -82,7 +82,8 @@ class Generator(object):
 
     XCODE_CMD_FMT = "xcodebuild -project \"%s\" -configuration Release -target \"%s\" %s CONFIGURATION_BUILD_DIR=%s"
 
-    CONFIG_FILE = "gen_config.json"
+    # CONFIG_FILE = "gen_config.json"
+    CONFIG_FILE = "gen_config_js.json"
     KEY_COPY_CFG = "copy_config"
     KEY_ANDROID_MKS = "android_mks"
     KEY_XCODE_PROJ_INFO = "xcode_proj_info"
@@ -105,6 +106,11 @@ class Generator(object):
             self.gen_engine_from_repo(self.x_repo_path, "cocos2d-x")
         elif not os.path.exists(os.path.join(self.root_dir, "cocos2d-x")):
             raise Exception("cocos2d-x is not existed, please specify cocos2d-x repo path by \"-x\".")
+
+        if self.js_repo_path is not None:
+            self.gen_engine_from_repo(self.js_repo_path, "cocos2d-js")
+        elif not os.path.exists(os.path.join(self.root_dir, "cocos2d-js")):
+            raise Exception("cocos2d-js is not existed, please specify cocos2d-js repo path by \"-js\".")
 
         self.load_config()
 
@@ -161,8 +167,10 @@ class Generator(object):
         # build .so for android
         if language == "js":
             engine_name = "cocos2d-js"
+            prebuilt_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "frameworks", "js-bindings", "cocos2d-x", "prebuilt", "android")
         else:
             engine_name = "cocos2d-x"
+            prebuilt_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "prebuilt", "android")
 
         engine_dir = os.path.join(self.root_dir, engine_name)
         console_dir = os.path.join(engine_dir, CONSOLE_PATH)
@@ -193,7 +201,6 @@ class Generator(object):
 
         # copy .a to prebuilt dir
         obj_dir = os.path.join(proj_path, ANDROID_A_PATH)
-        prebuilt_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "prebuilt", "android")
         copy_cfg = {
             "from": obj_dir,
             "to": prebuilt_dir,
@@ -214,7 +221,7 @@ class Generator(object):
         shutil.rmtree(proj_path)
 
         # build so with anysdk for runtime template
-        self.build_so_for_anysdk(language)
+        # self.build_so_for_anysdk(language)
 
     def build_so_for_anysdk(self, language):
         if language == "js":
@@ -470,7 +477,7 @@ class Generator(object):
             self.build_win32()
 
         if not self.no_android:
-            self.build_android("lua")
+            self.build_android("js")
 
     def clean_gen(self):
         gen_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks")
@@ -486,7 +493,7 @@ class Generator(object):
             self.copy_files()
 
             # create win32 directory
-            win32_dir = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-x/prebuilt/win32")
+            win32_dir = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-js/frameworks/js-bindings/cocos2d-x/prebuilt/win32")
             if not os.path.exists(win32_dir):
                 os.makedirs(win32_dir)
 
