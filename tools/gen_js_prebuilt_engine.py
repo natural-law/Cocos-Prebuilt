@@ -221,7 +221,7 @@ class Generator(object):
         shutil.rmtree(proj_path)
 
         # build so with anysdk for runtime template
-        # self.build_so_for_anysdk(language)
+        self.build_so_for_anysdk(language)
 
     def build_so_for_anysdk(self, language):
         if language == "js":
