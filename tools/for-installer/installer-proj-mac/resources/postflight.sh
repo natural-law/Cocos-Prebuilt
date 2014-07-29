@@ -60,5 +60,5 @@
 
 INSATLL_DIR="/Applications/cocos"
 chmod -R a=rwx "${INSATLL_DIR}"
-ln -s "/Applications/cocos/ide/Cocos Code IDE.app" "/Applications/cocos/Cocos Code IDE.app"
+# ln -s "/Applications/cocos/ide/Cocos Code IDE.app" "/Applications/cocos/Cocos Code IDE.app"
 open "${INSATLL_DIR}"
