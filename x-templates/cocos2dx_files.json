@@ -1,9 +1,10 @@
 {
     "common": [
-        "prebuilt",
         "cocos",
-        "extensions",
-        "external"
+        "modules",
+        "external",
+        "modules-info.json",
+        "version"
     ], 
     "lua": [
     ]

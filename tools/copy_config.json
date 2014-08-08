@@ -1,0 +1,68 @@
+{
+    "cocos2d-x" : {
+        "copy-engine" : [
+            {
+                "from" : "tools/cocos2d-console",
+                "to" : "tools/cocos2d-console",
+                "exclude" : [
+                    "*.pyc",
+                    "*.zip"
+                ]
+            },
+            {
+                "from" : "templates",
+                "to" : "templates",
+                "include" : [
+                    "lua-template-runtime/*"
+                ]
+            }
+        ],
+        "copy-modified" : [
+            {
+                "from" : "x-templates",
+                "to" : "templates"
+            },
+            {
+                "from" : "console",
+                "to" : "tools/cocos2d-console",
+                "exclude" : [
+                    "*.pyc",
+                    "*.zip"
+                ]
+            }
+        ]
+    },
+    "cocos2d-js" : {
+        "copy-engine" : [
+            {
+                "from" : "tools/cocos2d-console",
+                "to" : "tools/cocos2d-console",
+                "exclude" : [
+                    "*.pyc",
+                    "*.zip"
+                ]
+            },
+            {
+                "from" : "templates",
+                "to" : "templates",
+                "include" : [
+                    "js-template-runtime/*"
+                ]
+            }
+        ],
+        "copy-modified" : [
+            {
+                "from" : "js-templates",
+                "to" : "templates"
+            },
+            {
+                "from" : "console",
+                "to" : "tools/cocos2d-console",
+                "exclude" : [
+                    "*.pyc",
+                    "*.zip"
+                ]
+            }
+        ]
+    }
+}
