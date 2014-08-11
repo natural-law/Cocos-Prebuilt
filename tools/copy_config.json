@@ -6,7 +6,10 @@
                 "to" : "tools/cocos2d-console",
                 "exclude" : [
                     "*.pyc",
-                    "*.zip"
+                    "*.zip",
+                    ".idea/*",
+                    ".gitignore",
+                    ".git"
                 ]
             },
             {
@@ -39,7 +42,10 @@
                 "to" : "tools/cocos2d-console",
                 "exclude" : [
                     "*.pyc",
-                    "*.zip"
+                    "*.zip",
+                    ".idea/*",
+                    ".gitignore",
+                    ".git"
                 ]
             },
             {

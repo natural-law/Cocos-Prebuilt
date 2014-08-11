@@ -29,6 +29,36 @@
                 "exclude": []
             },
             {
+                "from": "modules/audio/lua-bindings/script",
+                "to": "runtime/mac/PrebuiltRuntimeLua.app/Contents/Resources",
+                "exclude": []
+            },
+            {
+                "from": "modules/audio/lua-bindings/script",
+                "to": "runtime/ios/PrebuiltRuntimeLua.app",
+                "exclude": []
+            },
+            {
+                "from": "modules/audio/lua-bindings/script",
+                "to": "runtime/win32",
+                "exclude": []
+            },
+            {
+                "from": "modules/network/lua-bindings/script",
+                "to": "runtime/mac/PrebuiltRuntimeLua.app/Contents/Resources",
+                "exclude": []
+            },
+            {
+                "from": "modules/network/lua-bindings/script",
+                "to": "runtime/ios/PrebuiltRuntimeLua.app",
+                "exclude": []
+            },
+            {
+                "from": "modules/network/lua-bindings/script",
+                "to": "runtime/win32",
+                "exclude": []
+            },
+            {
                 "from": "external/win32-specific/gles/prebuilt",
                 "to": "runtime/win32",
                 "include": [
