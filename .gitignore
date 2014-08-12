@@ -1,5 +1,5 @@
 # project files of PyCharm
-tools/.idea/*
+*/.idea/*
 
 # generated files
 gen/*

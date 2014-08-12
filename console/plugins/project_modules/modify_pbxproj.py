@@ -205,7 +205,9 @@ class PBXFileReference(PBXType):
         '.xib': 'file.xib',
         '.strings': 'text.plist.strings',
         '.bundle': 'wrapper.plug-in',
-        '.dylib': 'compiled.mach-o.dylib'
+        '.dylib': 'compiled.mach-o.dylib',
+        '.lua': 'text',
+        '.js': 'text'
     }
 
     trees = [
@@ -1155,38 +1157,47 @@ class XcodeProject(PBXDict):
     def remove_group(self, grp):
         pass
 
-    def remove_lib(self, lib_file_name):
+    def remove_file_by_path(self, file_path):
         objs = self.data.get('objects')
         fileRefID = ""
+        buildPhase = "PBXResourcesBuildPhase"
         for key in objs:
             obj = objs.get(key)
-            if obj.get('isa') == "PBXFileReference" and obj.get("name") == lib_file_name:
+            if obj.get('isa') == "PBXFileReference" and obj.get("path") == file_path:
                 fileRefID = key
+                buildPhase = FILE_TYPE_INFO.get(obj['lastKnownFileType'], "PBXResourcesBuildPhase")
                 objs.remove(key)
                 break
 
         if len(fileRefID) <= 0:
-            print("Can't find the lib file in the project configuration.")
+            print("Can't find the file in the project configuration.")
             return
 
         self.modified = True
 
-        buildFileID = ""
+        buildFileIDs = []
         for key in objs:
             obj = objs.get(key)
             if obj.get('isa') == "PBXBuildFile" and obj.get("fileRef") == fileRefID:
-                buildFileID = key
-                objs.remove(key)
-                break
+                if key not in buildFileIDs:
+                    buildFileIDs.append(key)
+
+        if len(buildFileIDs) > 0:
+            for id in buildFileIDs:
+                objs.remove(id)
 
         for key in objs:
             obj = objs.get(key)
-            if obj.get('isa') == "PBXFrameworksBuildPhase":
+            if obj.get('isa') == buildPhase:
                 files = obj.get("files")
+                need_remove_files = []
                 for fileID in files:
-                    if fileID == buildFileID:
-                        files.remove(fileID)
-                        break
+                    if fileID in buildFileIDs and fileID not in need_remove_files:
+                        need_remove_files.append(fileID)
+
+                if len(need_remove_files) > 0:
+                    for fID in need_remove_files:
+                        files.remove(fID)
 
             if obj.get('isa') == "PBXGroup":
                 children = obj.get("children")
