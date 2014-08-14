@@ -128,6 +128,12 @@ class GetEngine(object):
         for item in copy_cfg[dst_engine_name][KEY_COPY_MODIFIED]:
             excopy.copy_files_with_config(item, self.root_dir, engine_dst_path)
 
+        # modify the runtime templates
+        if dst_engine_name == "cocos2d-x":
+            import modify_lua_template
+            modifier = modify_lua_template.LuaModifier(engine_dst_path)
+            modifier.do_modify()
+        
         # generate android so
         self.generate_so(dst_engine_name)
 

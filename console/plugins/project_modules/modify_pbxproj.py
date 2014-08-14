@@ -509,7 +509,7 @@ class XCBuildConfiguration(PBXType):
 
         return modified
 
-    def add_user_header_search_paths(self, paths, recursive=True):
+    def add_user_header_search_paths(self, paths, recursive=True, add_inherite=True):
         modified = False
 
         if not isinstance(paths, list):
@@ -520,7 +520,7 @@ class XCBuildConfiguration(PBXType):
         if base not in self:
             self[base] = PBXDict()
 
-        if key not in self[base]:
+        if add_inherite and key not in self[base]:
             self[base][key] = "$(inherited)"
 
         path_list = self[base][key].split(" ")
@@ -546,13 +546,18 @@ class XCBuildConfiguration(PBXType):
     def remove_user_header_search_paths(self, paths):
         modified = False
 
-        if not isinstance(paths, list):
-            paths = [paths]
-
         base = "buildSettings"
         key = "USER_HEADER_SEARCH_PATHS"
         if base not in self or key not in self[base]:
             return modified
+
+        if paths == "ALL":
+            self[base][key] = ""
+            modified = True
+            return modified
+
+        if not isinstance(paths, list):
+            paths = [paths]
 
         path_list = self[base][key].split(" ")
         for path in paths:
@@ -742,12 +747,17 @@ class XcodeProject(PBXDict):
             if target_obj is None:
                 print("Can't find target %s" % target_name)
             else:
+                if target_obj.get("isa") == "PBXProject":
+                    add_inherite = False
+                else:
+                    add_inherite = True
+
                 build_cfg_list_id = target_obj.get("buildConfigurationList")
                 build_cfg_list = self.objects.get(build_cfg_list_id)
                 build_cfgs = build_cfg_list.get("buildConfigurations")
                 for cfg_id in build_cfgs:
                     cfg = self.objects.get(cfg_id)
-                    if cfg.add_user_header_search_paths(paths, recursive):
+                    if cfg.add_user_header_search_paths(paths, recursive, add_inherite):
                         self.modified = True
 
     def remove_user_header_search_paths(self, paths, target_name=None):
@@ -879,6 +889,17 @@ class XcodeProject(PBXDict):
 
         return groups
 
+    def get_group_id(self, group_name):
+        objs = self.data.get('objects')
+        ret_id = None
+        for key in objs:
+            obj = objs.get(key)
+            if obj.get("isa") == "PBXGroup" and obj.get("name") == group_name:
+                ret_id = key
+                break
+
+        return ret_id
+
     def get_or_create_group(self, name, path=None, parent=None):
         if not name:
             return None
@@ -920,9 +941,14 @@ class XcodeProject(PBXDict):
     def get_native_target(self, target_name):
         target = None
         for obj in self.objects.values():
-            if obj.get('isa') == "PBXNativeTarget" and obj.get("name") == target_name:
-                target = obj
-                break
+            if target_name == "PROJECT":
+                if obj.get('isa') == "PBXProject":
+                    target = obj
+                    break
+            else:
+                if obj.get('isa') == "PBXNativeTarget" and obj.get("name") == target_name:
+                    target = obj
+                    break
 
         return target
 
@@ -1155,7 +1181,119 @@ class XcodeProject(PBXDict):
                 os.symlink(srcLib, finalLib)
 
     def remove_group(self, grp):
-        pass
+        objs = self.data.get('objects')
+        group_info = objs.get(grp)
+        if group_info is None:
+            print("Can't find the PBXGroup %s in the project configuration." % grp)
+            return
+
+        objs.remove(grp)
+        children = group_info.get("children")
+
+        self.modified = True
+        for child in children:
+            child_info = objs.get(child)
+            if child_info.get("isa") == "PBXGroup":
+                self.remove_group(child)
+            else:
+                self.remove_file_by_id(child)
+
+    def remove_file_by_id(self, file_id):
+        objs = self.data.get('objects')
+        file_info = objs.get(file_id)
+        if file_info is None:
+            print("Can't find the file ID \"%s\" in the project configuration." % file_id)
+            return
+
+        if file_info["isa"] == "PBXReferenceProxy":
+            buildPhase = FILE_TYPE_INFO.get(file_info['fileType'], "PBXResourcesBuildPhase")
+        else:
+            buildPhase = FILE_TYPE_INFO.get(file_info['lastKnownFileType'], "PBXResourcesBuildPhase")
+        objs.remove(file_id)
+
+        self.modified = True
+
+        # remove build file
+        need_remove_build_files = []
+        for key in objs:
+            obj = objs.get(key)
+            if obj.get("isa") == "PBXBuildFile" and obj.get("fileRef") == file_id:
+                need_remove_build_files.append(key)
+
+        for item in need_remove_build_files:
+            objs.remove(item)
+
+            # remove the build file form build phase
+            for key in objs:
+                obj = objs.get(key)
+                if obj.get("isa") == buildPhase:
+                    phase_files = obj.get("files")
+                    if item in phase_files:
+                        phase_files.remove(item)
+
+    def remove_proj_reference(self, proj_name):
+        objs = self.data.get('objects')
+        fileRefID = ""
+        for key in objs:
+            obj = objs.get(key)
+            if obj.get("isa") == "PBXFileReference" and obj.get("name") == proj_name:
+                fileRefID = key
+                objs.remove(key)
+                break
+
+        if len(fileRefID) <= 0:
+            print("Can't find the project reference in the project configuration.")
+            return
+
+        # remove related configs
+        need_remove_container = []
+        need_remove_product_group = []
+        for key in objs:
+            obj = objs.get(key)
+            isa_value = obj.get("isa")
+            if isa_value == "PBXContainerItemProxy" and obj.get("containerPortal") == fileRefID:
+                need_remove_container.append(key)
+
+            if isa_value == "PBXGroup":
+                children = obj.get("children")
+                if fileRefID in children:
+                    children.remove(fileRefID)
+
+            if isa_value == "PBXProject":
+                proj_refers = obj.get("projectReferences")
+                for refer in proj_refers:
+                    if refer.get("ProjectRef") == fileRefID:
+                        proj_refers.remove(refer)
+                        if len(proj_refers) == 0:
+                            obj.remove("projectReferences")
+                        need_remove_product_group.append(refer.get("ProductGroup"))
+
+        # remove containers
+        need_remove_dependencies = []
+        for item in need_remove_container:
+            objs.remove(item)
+
+            for key in objs:
+                obj = objs.get(key)
+                if obj.get("isa") == "PBXTargetDependency" and obj.get("targetProxy") == item:
+                    need_remove_dependencies.append(key)
+
+        # remove dependencies
+        for item in need_remove_dependencies:
+            objs.remove(item)
+
+            for key in objs:
+                obj = objs.get(key)
+                if obj.get("isa") == "PBXNativeTarget":
+                    depends = obj.get("dependencies")
+                    if item in depends:
+                        depends.remove(item)
+
+        # remove group
+        for group in need_remove_product_group:
+            self.remove_group(group)
+
+        self.modified = True
 
     def remove_file_by_path(self, file_path):
         objs = self.data.get('objects')
