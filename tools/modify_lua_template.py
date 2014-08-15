@@ -54,6 +54,14 @@ KEY_MODULE_MAC_LIB_FILE_NAME = "mac_lib_file_name"
 KEY_MODULE_TARGET_DIR = "target_dir"
 KEY_MODULE_LUA_BINDINGS = "lua_bindings"
 KEY_MODULE_LUA_LIB_NAME = "lua_lib_name"
+KEY_MODULE_DEPEND_MODULES = "depend_modules"
+
+WIN32_COPY_LIB_PATHS = [
+    "external\glfw3\prebuilt\win32",
+    "external\win32-specific\zlib\prebuilt",
+    "external\win32-specific\icon\prebuilt",
+    "external\win32-specific\gles\prebuilt"
+]
 
 class LuaModifier(object):
     def __init__(self, engine_path):
@@ -95,6 +103,30 @@ class LuaModifier(object):
                     need_remove.append(item)
 
         return need_remove
+
+    def add_to_list(self, item, list):
+        if item not in list:
+            list.append(item)
+
+    def gather_module_prebuilt_path(self, module_name, ret_paths):
+        module_info = self.modules_info[module_name]
+        module_dir = module_info[KEY_MODULE_TARGET_DIR]
+        p = os.path.join(module_dir, "prebuilt")
+        self.add_to_list(p, ret_paths)
+
+        if module_info.has_key(KEY_MODULE_LUA_BINDINGS):
+            p = os.path.join(module_dir, "lua-bindings/prebuilt")
+            self.add_to_list(p, ret_paths)
+            lua_binding_info = module_info[KEY_MODULE_LUA_BINDINGS]
+            if lua_binding_info.has_key(KEY_MODULE_DEPEND_MODULES):
+                for d in lua_binding_info[KEY_MODULE_DEPEND_MODULES]:
+                    ret_paths = self.gather_module_prebuilt_path(d, ret_paths)
+
+        if module_info.has_key(KEY_MODULE_DEPEND_MODULES):
+            for d in module_info[KEY_MODULE_DEPEND_MODULES]:
+                ret_paths = self.gather_module_prebuilt_path(d, ret_paths)
+
+        return ret_paths
 
     def modify_template_json(self, json_path):
         f = open(json_path)
@@ -348,6 +380,82 @@ class LuaModifier(object):
 
         # remove the project references
         vcx_proj.remove_proj_reference()
+
+        # set include paths
+        proj_include_paths = [
+            "../Classes",
+            "../Classes/runtime",
+            "../Classes/protobuf-lite"
+        ]
+        ret_paths = []
+        for p in proj_include_paths:
+            rel_path = "$(ProjectDir)%s" % p
+            ret_paths.append(rel_path)
+
+        for p in LUA_ALL_INCLUDE_PATHS:
+            rel_path = "$(EngineRoot)%s" % p
+            ret_paths.append(rel_path)
+
+        vcx_proj.set_include_dirs(ret_paths)
+
+        # modify the PreBuildEvent for copy scripts
+        scipt_paths = []
+        for m in self.select_modules:
+            module_info = self.modules_info[m]
+            if module_info.has_key(KEY_MODULE_LUA_BINDINGS):
+                p = os.path.join(module_info[KEY_MODULE_TARGET_DIR], "lua-bindings/script")
+                abs_path = os.path.join(self.engine_path, p)
+                if os.path.exists(abs_path):
+                    scipt_paths.append(p)
+
+        configs = [ "debug", "release" ]
+        for config in configs:
+            prebuild_cmd = vcx_proj.get_event_command("PreBuildEvent", config)
+            import io
+            buf = io.StringIO(prebuild_cmd)
+            newlines = []
+
+            # remove the old copy script command
+            for cmd_line in buf.readlines():
+                need_keep = True
+                for check_str in LUA_CHECK_COPY_SCRIPT_PATHS:
+                    check_str = check_str.replace("/", "\\")
+                    temp_cmd = cmd_line.replace("/", "\\")
+                    if temp_cmd.find(check_str) > 0:
+                        need_keep = False
+                        break
+
+                if need_keep:
+                    newlines.append(cmd_line)
+
+            # add the new commands for copy scripts
+            for p in scipt_paths:
+                path = p.replace("/", "\\")
+                cmd_line = "xcopy \"$(EngineRoot)%s\\*.lua\" \"$(LocalDebuggerWorkingDirectory)\" /e /Y\n" % path
+                newlines.append(cmd_line)
+
+            new_cmds = "".join(newlines)
+            vcx_proj.set_event_command("PreBuildEvent", new_cmds, config)
+
+        # modify the PreLinkEvent for copy libraries
+        prebuilt_paths = []
+        for m in self.select_modules:
+            prebuilt_paths = self.gather_module_prebuilt_path(m, prebuilt_paths)
+
+        lib_paths = []
+        for p in WIN32_COPY_LIB_PATHS:
+            lib_paths.append(p)
+
+        for p in prebuilt_paths:
+            lib_paths.append(os.path.join(p, "win32"))
+
+        copy_libs_cmd = "if not exist \"$(OutDir)\" mkdir \"$(OutDir)\"\n"
+        for p in lib_paths:
+            cmd_line = "xcopy /Y /Q \"$(EngineRoot)%s\\*.*\" \"$(OutDir)\"\n" % p
+            cmd_line = cmd_line.replace("/", "\\")
+            copy_libs_cmd += cmd_line
+
+        vcx_proj.set_event_command("PreLinkEvent", copy_libs_cmd)
 
         vcx_proj.save()
 
