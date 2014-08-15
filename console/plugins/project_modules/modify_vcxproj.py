@@ -12,6 +12,7 @@ def os_is_mac():
 class VCXProject(object):
     def __init__(self, proj_file_path):
         self.xmldoc = minidom.parse(proj_file_path)
+        self.root_node = self.xmldoc.documentElement
         if os.path.isabs(proj_file_path):
             self.file_path = proj_file_path
         else:
@@ -54,7 +55,7 @@ class VCXProject(object):
         print("Saving Finished")
 
     def remove_lib(self, lib_name, lib_dir):
-        cfg_nodes = self.xmldoc.getElementsByTagName("ItemDefinitionGroup")
+        cfg_nodes = self.root_node.getElementsByTagName("ItemDefinitionGroup")
         for cfg_node in cfg_nodes:
             cond_attr = cfg_node.attributes["Condition"].value
             if cond_attr.lower().find("debug") >= 0:
@@ -104,7 +105,7 @@ class VCXProject(object):
                     cmd_node.firstChild.nodeValue = ("".join(newlines)).rstrip("\r\n")
 
     def add_lib(self, lib_name, add_copy_cmd=None, cmd_event="PreBuildEvent"):
-        cfg_nodes = self.xmldoc.getElementsByTagName("ItemDefinitionGroup")
+        cfg_nodes = self.root_node.getElementsByTagName("ItemDefinitionGroup")
         for cfg_node in cfg_nodes:
             cond_attr = cfg_node.attributes["Condition"].value
             if cond_attr.lower().find("debug") >= 0:
@@ -136,3 +137,10 @@ class VCXProject(object):
                     newCmd = "%s\n%s" % (cmd, add_copy_cmd)
                     print("Add command line \"%s\" for \"%s\" in \"%s\" configuration" % (add_copy_cmd, cmd_event, cur_mode))
                     cmd_node.firstChild.nodeValue = newCmd
+
+    def remove_proj_reference(self):
+        itemgroups = self.root_node.getElementsByTagName("ItemGroup")
+        for item in itemgroups:
+            proj_refers = item.getElementsByTagName("ProjectReference")
+            if len(proj_refers) > 0:
+                self.root_node.removeChild(item)

@@ -24,7 +24,8 @@ LUA_MODIFY_FILES = {
     "frameworks/runtime-src/proj.android/project.properties" : "modify_project_properties",
     "frameworks/runtime-src/proj.android/jni/Android.mk" : "modify_android_mk",
     "frameworks/runtime-src/proj.ios_mac/HelloLua.xcodeproj/project.pbxproj" : "modify_xcode_proj",
-    "frameworks/runtime-src/proj.win32/build-cfg.json" : "modify_build_config"
+    "frameworks/runtime-src/proj.win32/build-cfg.json" : "modify_build_config",
+    "frameworks/runtime-src/proj.win32/HelloLua.vcxproj" : "modify_vs_proj"
 }
 
 LUA_ALL_INCLUDE_PATHS = [
@@ -337,6 +338,18 @@ class LuaModifier(object):
 
         if pbx_proj.modified:
             pbx_proj.save()
+
+    def modify_vs_proj(self, proj_file_path):
+        proj_modifier_path = os.path.join(os.path.dirname(__file__), '..', 'console', 'plugins', "project_modules")
+        sys.path.append(proj_modifier_path)
+
+        import modify_vcxproj
+        vcx_proj = modify_vcxproj.VCXProject(proj_file_path)
+
+        # remove the project references
+        vcx_proj.remove_proj_reference()
+
+        vcx_proj.save()
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Generate prebuilt engine for Cocos Engine.")
