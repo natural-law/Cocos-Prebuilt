@@ -1,9 +1,10 @@
 {
     "common": [
-        "prebuilt",
+        "build",
         "cocos",
         "extensions",
-        "external"
+        "external",
+        "plugin"
     ], 
     "lua": [
     ]

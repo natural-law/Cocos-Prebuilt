@@ -83,7 +83,8 @@ class Generator(object):
     XCODE_CMD_FMT = "xcodebuild -project \"%s\" -configuration Release -target \"%s\" %s CONFIGURATION_BUILD_DIR=%s"
 
     # CONFIG_FILE = "gen_config.json"
-    CONFIG_FILE = "gen_config_js.json"
+    JS_CONFIG_FILE = "gen_config_js.json"
+    X_CONFIG_FILE = "gen_config_x.json"
     KEY_COPY_CFG = "copy_config"
     KEY_ANDROID_MKS = "android_mks"
     KEY_XCODE_PROJ_INFO = "xcode_proj_info"
@@ -98,6 +99,7 @@ class Generator(object):
         self.need_clean = args.need_clean
         self.no_android = args.no_android
         self.use_incredibuild = args.use_incredibuild
+        self.disable_strip = args.disable_strip
 
         self.x_repo_path = args.x_repo_path
         self.js_repo_path = args.js_repo_path
@@ -115,15 +117,30 @@ class Generator(object):
         self.load_config()
 
     def load_config(self):
-        cfg_json = os.path.join(self.tool_dir, Generator.CONFIG_FILE)
-        f = open(cfg_json)
-        cfg_info = json.load(f)
+        # load x config
+        x_cfg_json = os.path.join(self.tool_dir, Generator.X_CONFIG_FILE)
+        f = open(x_cfg_json)
+        x_cfg_info = json.load(f)
         f.close()
 
-        self.copy_cfg = cfg_info[Generator.KEY_COPY_CFG]
-        self.android_mks = cfg_info[Generator.KEY_ANDROID_MKS]
-        self.xcode_proj_info = cfg_info[Generator.KEY_XCODE_PROJ_INFO]
-        self.win32_proj_info = cfg_info[Generator.KEY_WIN32_PROJ_INFO]
+        # load js config
+        js_cfg_json = os.path.join(self.tool_dir, Generator.JS_CONFIG_FILE)
+        f = open(js_cfg_json)
+        js_cfg_info = json.load(f)
+        f.close()
+
+
+        self.copy_cfg = x_cfg_info[Generator.KEY_COPY_CFG] + js_cfg_info[Generator.KEY_COPY_CFG]
+        self.android_mks = x_cfg_info[Generator.KEY_ANDROID_MKS] + js_cfg_info[Generator.KEY_ANDROID_MKS]
+        self.xcode_proj_info = {}
+        self.win32_proj_info = {}
+
+        for cfg_info in (x_cfg_info, js_cfg_info):
+            for key in cfg_info[Generator.KEY_XCODE_PROJ_INFO].keys():
+                self.xcode_proj_info[key] = cfg_info[Generator.KEY_XCODE_PROJ_INFO][key]
+
+            for key in cfg_info[Generator.KEY_WIN32_PROJ_INFO].keys():
+                self.win32_proj_info[key] = cfg_info[Generator.KEY_WIN32_PROJ_INFO][key]
 
     def gen_engine_from_repo(self, repo_dir, repo_name):
         # get the make-package tool
@@ -162,6 +179,11 @@ class Generator(object):
             file_obj = open(mk_file, "a")
             file_obj.write("\nAPP_ABI :=armeabi armeabi-v7a\n")
             file_obj.close()
+
+    def is_32bit_windows(self):
+        arch = os.environ['PROCESSOR_ARCHITECTURE'].lower()
+        archw = os.environ.has_key("PROCESSOR_ARCHITEW6432")
+        return (arch == "x86" and not archw)
 
     def build_android(self, language):
         # build .so for android
@@ -209,6 +231,24 @@ class Generator(object):
             ]
         }
         excopy.copy_files_with_config(copy_cfg, obj_dir, prebuilt_dir)
+
+        if not self.disable_strip:
+            # strip the android libs
+            ndk_root = os.environ["NDK_ROOT"]
+            if os_is_win32():
+                if self.is_32bit_windows():
+                    bit_str = ""
+                else:
+                    bit_str = "-x86_64"
+
+                sys_folder_name = "windows%s" % bit_str
+            elif os_is_mac():
+                sys_folder_name = "darwin-x86_64"
+
+            strip_cmd_path = os.path.join(ndk_root, "toolchains/arm-linux-androideabi-4.8/prebuilt/%s/arm-linux-androideabi/bin/strip" % sys_folder_name)
+            if os.path.exists(strip_cmd_path):
+                strip_cmd = "%s -S %s/armeabi*/*.a" % (strip_cmd_path, prebuilt_dir)
+                run_shell(strip_cmd)
 
         # modify the mk files to prebuilt version
         import gen_prebuilt_mk
@@ -467,6 +507,13 @@ class Generator(object):
             shutil.rmtree(ios_sim_libs_dir)
             shutil.rmtree(ios_dev_libs_dir)
 
+            if not self.disable_strip:
+                # strip the libs
+                ios_strip_cmd = "xcrun -sdk iphoneos strip -S %s/*.a" % ios_out_dir
+                run_shell(ios_strip_cmd)
+                mac_strip_cmd = "xcrun strip -S %s/*.a" % mac_out_dir
+                run_shell(mac_strip_cmd)
+
     def build_all_libs(self):
         if os_is_mac():
             # build for iOS & Mac
@@ -477,6 +524,7 @@ class Generator(object):
             self.build_win32()
 
         if not self.no_android:
+            self.build_android("lua")
             self.build_android("js")
 
     def clean_gen(self):
@@ -492,12 +540,17 @@ class Generator(object):
             # copy the necessary files
             self.copy_files()
 
-            # create win32 directory
-            win32_dir = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-js/frameworks/js-bindings/cocos2d-x/prebuilt/win32")
-            if not os.path.exists(win32_dir):
-                os.makedirs(win32_dir)
-
-        self.build_all_libs()
+        #     # create win32 directory in -x engine
+        #     x_win32_dir = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-x/prebuilt/win32")
+        #     if not os.path.exists(x_win32_dir):
+        #         os.makedirs(x_win32_dir)
+        #
+        #     # create win32 directory in -js engine
+        #     js_win32_dir = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-js/frameworks/js-bindings/cocos2d-x/prebuilt/win32")
+        #     if not os.path.exists(js_win32_dir):
+        #         os.makedirs(js_win32_dir)
+        #
+        # self.build_all_libs()
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Generate prebuilt engine for Cocos Engine.")
@@ -506,6 +559,7 @@ if __name__ == "__main__":
     parser.add_argument('-i', "--incredibuild", dest='use_incredibuild', action="store_true", help='Use incredibuild to build win32 projects. Only available on windows.')
     parser.add_argument('-x', "--cocos2dx", dest='x_repo_path', help='Set the repo path of cocos2d-x.')
     parser.add_argument('-j', "--cocos2djs", dest='js_repo_path', help='Set the repo path of cocos2d-js.')
+    parser.add_argument('-d', "--disable-strip", dest='disable_strip', action="store_true", help='Disable the strip of the generated libs.')
     (args, unknown) = parser.parse_known_args()
 
     if len(unknown) > 0:
