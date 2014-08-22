@@ -33,14 +33,15 @@ LOCAL_SRC_FILES := \
 ../../Classes/ConfigParser.cpp \
 lua/Runtime_android.cpp \
 lua/main.cpp \
-../../Classes/anysdkbindings.cpp \
-../../Classes/anysdk_manual_bindings.cpp
+../../../anysdk/lua-bindings/src/anysdkbindings.cpp \
+../../../anysdk/lua-bindings/src/anysdk_manual_bindings.cpp
 
 
 LOCAL_C_INCLUDES := \
 $(LOCAL_PATH)/../../Classes/protobuf-lite \
 $(LOCAL_PATH)/../../Classes/runtime \
-$(LOCAL_PATH)/../../Classes
+$(LOCAL_PATH)/../../Classes \
+$(LOCAL_PATH)/../../../anysdk/lua-bindings/src
 
 LOCAL_STATIC_LIBRARIES := curl_static_prebuilt
 

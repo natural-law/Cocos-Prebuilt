@@ -6,8 +6,8 @@
 #include "ConfigParser.h"
 
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
-#include "anysdkbindings.hpp"
-#include "anysdk_manual_bindings.hpp"
+#include "anysdkbindings.h"
+#include "anysdk_manual_bindings.h"
 #endif
 
 using namespace CocosDenshion;
@@ -61,10 +61,11 @@ bool AppDelegate::applicationDidFinishLaunching()
     LuaStack* stack = engine->getLuaStack();
     stack->setXXTEAKeyAndSign("2dxLua", strlen("2dxLua"), "XXTEA", strlen("XXTEA"));
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
-    lua_getglobal(stack->getLuaState(), "_G");
-    register_all_anysdkbindings(stack->getLuaState());
-    register_all_anysdk_manual_bindings(stack->getLuaState());
-    lua_pop(stack->getLuaState(), 1);
+    lua_State *tolua_s = stack->getLuaState();
+    lua_getglobal(tolua_s, "_G");
+    tolua_anysdk_open(tolua_s);
+    tolua_anysdk_manual_open(tolua_s);
+    lua_pop(tolua_s, 1);
 #endif
     //register custom function
     //LuaStack* stack = engine->getLuaStack();

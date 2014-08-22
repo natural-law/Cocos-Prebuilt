@@ -83,7 +83,7 @@
     <target name="-pre-compile">
         <!-- Redefine project.all.jars.path before -compile executes -->
         <path id="project.all.jars.path">
-            <fileset file="./anysdk/android/libPluginProtocol.jar" />
+            <fileset file="../../anysdk/android/libPluginProtocol.jar" />
             <fileset file="../../cocos2d-x/cocos/platform/android/java/bin/classes.jar" />
         </path>   
     </target>
