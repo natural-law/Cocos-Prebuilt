@@ -3,7 +3,8 @@
         "prebuilt",
         "cocos",
         "extensions",
-        "external"
+        "external",
+        "plugin"
     ], 
     "lua": [
     ]

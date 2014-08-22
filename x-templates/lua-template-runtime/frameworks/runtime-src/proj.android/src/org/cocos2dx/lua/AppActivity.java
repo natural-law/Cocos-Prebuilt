@@ -30,6 +30,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.ArrayList;
 
 import org.cocos2dx.lib.Cocos2dxActivity;
 
@@ -48,6 +49,7 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.text.format.Formatter;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.anysdk.framework.PluginWrapper;
@@ -76,7 +78,8 @@ public class AppActivity extends Cocos2dxActivity{
 		// Check the wifi is opened when the native is debug.
 		if(nativeIsDebug())
 		{
-			if(!isWifiConnected())
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+			if(!isNetworkConnected())
 			{
 				AlertDialog.Builder builder=new AlertDialog.Builder(this);
 				builder.setTitle("Warning");
@@ -96,11 +99,20 @@ public class AppActivity extends Cocos2dxActivity{
 		}
 		hostIPAdress = getHostIpAddress();
 	}
-	 private boolean isWifiConnected() {  
+	private boolean isNetworkConnected() {
 	        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);  
 	        if (cm != null) {  
 	            NetworkInfo networkInfo = cm.getActiveNetworkInfo();  
-	            if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {  
+			ArrayList networkTypes = new ArrayList();
+			networkTypes.add(ConnectivityManager.TYPE_WIFI);
+			try {
+				networkTypes.add(ConnectivityManager.class.getDeclaredField("TYPE_ETHERNET").getInt(null));
+			} catch (NoSuchFieldException nsfe) {
+			}
+			catch (IllegalAccessException iae) {
+				throw new RuntimeException(iae);
+			}
+			if (networkInfo != null && networkTypes.contains(networkInfo.getType())) {
 	                return true;  
 	            }  
 	        }  

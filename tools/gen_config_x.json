@@ -3,32 +3,24 @@
         {
             "from": "cocos2d-x/cocos",
             "to": "gen/cocos/frameworks/cocos2d-x/cocos",
-            "include": [
-                "editor-support/*/Android.mk",
-                "ui/Android.mk",
-                "audio/android/Android.mk",
-                "scripting/lua-bindings/Android.mk",
-                "Android.mk",
-                "network/Android.mk",
-                "platform/android/Android.mk",
-                "cocos2d.h",
-                "2d/*.h$",
-                "2d/*.props$",
-                "3d/*.h$",
-                "3d/*.inl",
-                "audio/include/*.h",
-                "base/*.h",
-                "deprecated/*.h",
-                "editor-support/*.h",
-                "math/*.h",
-                "math/*.inl",
-                "network/*.h",
-                "physics/*.h",
-                "platform/*.h",
-                "renderer/*.h",
-                "scripting/*.h",
-                "storage/*.h$",
-                "ui/*.h"
+            "exclude": [
+                "*.cpp$",
+                "*.c$",
+                "*.m$",
+                "*.mm$",
+                "*wp8",
+                "*winrt",
+                "*.vcxproj",
+                "*CMakeLists.txt",
+                "*linux",
+                "*java/bin/*",
+                "*java/libs/*",
+                "*java/gen/*",
+                "*proj.*",
+                "audio/ios/*",
+                "audio/mac/*",
+                "audio/openal/*",
+                "audio/win32/*"
             ]
         },
         {
@@ -46,57 +38,38 @@
         {
             "from": "cocos2d-x/external",
             "to": "gen/cocos/frameworks/cocos2d-x/external",
-            "include": [
-                "*/Android.mk",
-                "curl/prebuilt/android/*.a",
-                "curl/prebuilt/win32/*",
-                "curl/include/*.h",
-                "freetype2/prebuilt/android/*.a",
-                "freetype2/prebuilt/win32/*",
-                "freetype2/include/*.h",
-                "jpeg/prebuilt/android/*.a",
-                "jpeg/prebuilt/win32/*",
-                "jpeg/include/*.h",
-                "png/prebuilt/android/*.a",
-                "png/prebuilt/win32/*",
-                "png/include/*.h",
-                "tiff/prebuilt/android/*.a",
-                "tiff/prebuilt/win32/*",
-                "tiff/include/*.h",
-                "webp/prebuilt/android/*.a",
-                "webp/prebuilt/win32/*",
-                "webp/include/*.h",
-                "websockets/prebuilt/android/*.a",
-                "websockets/prebuilt/win32/*",
-                "websockets/include/*.h",
-                "lua/luajit/prebuilt/android/*.a",
-                "Box2D/*.h",
-                "chipmunk/include/*.h",
-                "glfw3/include/*.h",
-                "glfw3/prebuilt/win32/*",
-                "json/*.h",
-                "lua/tolua/*.h",
-                "lua/luajit/include/*.h",
-                "lua/luasocket/*.lua$",
-                "tinyxml2/*.h",
-                "unzip/*.h",
-                "xxhash/*.h",
-                "win32-specific/*"
+            "exclude": [
+                "*.cpp$",
+                "*.c$",
+                "*.m$",
+                "*.mm$",
+                "*wp8",
+                "*linux",
+                "*winrt",
+                "*proj.*",
+                "*CMakeLists.txt",
+                "config.json",
+                "version.json",
+                "lua/lua/*",
+                "lua/luajit/*.sh",
+                "lua/luajit/src/*",
+                "*prebuilt/ios/*",
+                "*prebuilt/mac/*"
             ]
         },
         {
-            "from": "cocos2d-x/cocos/platform/android/java",
-            "to": "gen/cocos/frameworks/cocos2d-x/cocos/platform/android/java"
-        },
-        {
-            "from": "cocos2d-x/cocos/scripting/lua-bindings/script",
-            "to": "gen/cocos/frameworks/cocos2d-x/cocos/scripting/lua-bindings/script"
+            "from": "cocos2d-x/plugin",
+            "to": "gen/cocos/frameworks/cocos2d-x/plugin",
+            "exclude": [
+                "plugin-x_ios.xcworkspace",
+                "samples/*",
+                "tools/pluginx-bindings-generator/*"
+            ]
         },
         {
             "from": "cocos2d-x/templates",
             "to": "gen/cocos/frameworks/cocos2d-x/templates",
             "exclude" : [
-                "cpp-template-default/*",
                 "lua-template-default/*"
             ]
         },
