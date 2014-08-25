@@ -68,7 +68,7 @@ function GameScene:createLayerFarm()
     local layerFarm = rootNode:getChildByName("Farm")
 
     -- add moving dog
-    local spriteDog = creatDog()
+    local spriteDog = self:creatDog()
     layerFarm:addChild(spriteDog)
 
     -- handing touch events
@@ -136,7 +136,7 @@ function GameScene:createLayerFarm()
     menuPopupItem:setPosition(0, 0)
     menuPopupItem:registerScriptTapHandler(menuCallbackClosePopup)
     menuPopup = cc.Menu:create(menuPopupItem)
-    menuPopup:setPosition(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2)
+    menuPopup:setPosition(self.origin.x + self.visibleSize.width / 2, self.origin.y + self.visibleSize.height / 2)
     menuPopup:setVisible(false)
     rootNode:addChild(menuPopup)
     

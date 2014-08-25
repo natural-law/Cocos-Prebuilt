@@ -154,7 +154,6 @@ class VCXProject(object):
             event_node = self.get_or_create_node(cfg_node, event)
             cmd_node = self.get_or_create_node(event_node, "Command")
             cmd_node.firstChild.nodeValue = command
-            break
 
     def set_include_dirs(self, paths):
         if "%(AdditionalIncludeDirectories)" not in paths:

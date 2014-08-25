@@ -486,6 +486,22 @@ class Generator(object):
 
         print("Win32 build succeeded.")
 
+         # modify the VS project file of templates
+        import modify_template
+        if self.gen_x:
+            x_path = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-x")
+            modifier = modify_template.TemplateModifier(x_path)
+            cpp_proj_path = os.path.join(x_path, "templates/cpp-template-default/proj.win32/HelloCpp.vcxproj")
+            lua_proj_path = os.path.join(x_path, "templates/lua-template-runtime/frameworks/runtime-src/proj.win32/HelloLua.vcxproj")
+            modifier.modify_vs_proj(cpp_proj_path, "cpp")
+            modifier.modify_vs_proj(lua_proj_path, "lua")
+
+        if self.gen_js:
+            js_path = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-js")
+            modifier = modify_template.TemplateModifier(js_path)
+            js_proj_path = os.path.join(js_path, "templates/js-template-runtime/frameworks/runtime-src/proj.win32/HelloJavascript.vcxproj")
+            modifier.modify_vs_proj(js_proj_path, "js")
+
     def build_ios_mac(self):
         for key in self.xcode_proj_info.keys():
             output_dir = self.xcode_proj_info[key][Generator.KEY_OUTPUT_DIR]
@@ -538,7 +554,7 @@ class Generator(object):
         if self.gen_js:
             js_path = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-js")
             modifier = modify_template.TemplateModifier(js_path)
-            js_proj_path = os.path.join(js_path, "templates/js-template-runtime/frameworks/runtime-src/proj.ios_mac/HelloLua.xcodeproj/project.pbxproj")
+            js_proj_path = os.path.join(js_path, "templates/js-template-runtime/frameworks/runtime-src/proj.ios_mac/HelloJavascript.xcodeproj/project.pbxproj")
             modifier.modify_xcode_proj(js_proj_path, "js")
 
     def build_all_libs(self):
