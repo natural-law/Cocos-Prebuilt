@@ -54,7 +54,9 @@
                 "lua/luajit/*.sh",
                 "lua/luajit/src/*",
                 "*prebuilt/ios/*",
-                "*prebuilt/mac/*"
+                "*prebuilt/mac/*",
+                "*prebuilt/win32/*",
+                "win32-specific/*/prebuilt/*"
             ]
         },
         {

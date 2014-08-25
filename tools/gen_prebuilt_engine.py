@@ -399,21 +399,12 @@ class Generator(object):
         return (arch == "x86" and not archw)
 
     def build_win32_proj(self, cmd_path, sln_path, proj_name, mode):
-        if self.use_incredibuild:
-            build_cmd = " ".join([
-                "\"%s\"" % cmd_path,
-                "\"%s\"" % sln_path,
-                "/%s" % mode,
-                "/prj=%s" % proj_name,
-                "/cfg=\"Release|Win32\""
-            ])
-        else:
-            build_cmd = " ".join([
-                "\"%s\"" % cmd_path,
-                "\"%s\"" % sln_path,
-                "/%s \"Release|Win32\"" % mode,
-                "/Project \"%s\"" % proj_name
-            ])
+        build_cmd = " ".join([
+            "\"%s\"" % cmd_path,
+            "\"%s\"" % sln_path,
+            "/%s \"Release|Win32\"" % mode,
+            "/Project \"%s\"" % proj_name
+        ])
         run_shell(build_cmd)
 
     def build_win32(self):
@@ -442,11 +433,6 @@ class Generator(object):
             proj_path = os.path.join(self.root_dir, key)
             vs_command, needUpgrade = self.get_vs_cmd_path(vs_reg, proj_path)
 
-            if self.use_incredibuild:
-                cmd_path = "BuildConsole"
-            else:
-                cmd_path = vs_command
-
             # get the build folder & win32 output folder
             build_folder_path = os.path.join(os.path.dirname(proj_path), "Release.win32")
             if os.path.exists(build_folder_path):
@@ -467,20 +453,35 @@ class Generator(object):
                 ])
                 run_shell(commandUpgrade)
 
-            for proj_name in self.win32_proj_info[key][Generator.KEY_TARGETS]:
-                # build the projects
-                self.build_win32_proj(cmd_path, proj_path, proj_name, "build")
+            if self.use_incredibuild:
+                # use incredibuild, build whole sln
+                build_cmd = " ".join([
+                    "BuildConsole",
+                    "%s" % proj_path,
+                    "/build",
+                    "/cfg=\"Release|Win32\""
+                ])
+                run_shell(build_cmd)
 
-                lib_file_path = os.path.join(build_folder_path, "%s.lib" % proj_name)
-                if not os.path.exists(lib_file_path):
-                    # if the lib is not generated, rebuild the project
-                    self.build_win32_proj(cmd_path, proj_path, proj_name, "rebuild")
+            if not self.use_incredibuild:
+                for proj_name in self.win32_proj_info[key][Generator.KEY_TARGETS]:
+                    # build the projects
+                    self.build_win32_proj(vs_command, proj_path, proj_name, "build")
 
-                if not os.path.exists(lib_file_path):
-                    raise Exception("Library %s not generated as expected!" % lib_file_path)
+                    lib_file_path = os.path.join(build_folder_path, "%s.lib" % proj_name)
+                    if not os.path.exists(lib_file_path):
+                        # if the lib is not generated, rebuild the project
+                        self.build_win32_proj(vs_command, proj_path, proj_name, "rebuild")
+
+                    if not os.path.exists(lib_file_path):
+                        raise Exception("Library %s not generated as expected!" % lib_file_path)
 
             # copy the libs into prebuilt dir
             for file_name in os.listdir(build_folder_path):
+                name, ext = os.path.splitext(file_name)
+                if ext != ".lib" and ext != ".dll":
+                    continue
+
                 file_path = os.path.join(build_folder_path, file_name)
                 shutil.copy(file_path, win32_output_dir)
 
