@@ -32,9 +32,6 @@ class TemplateModifier(object):
         else:
             self.engine_path = os.path.abspath(engine_path)
 
-        self.template_path = os.path.join(self.engine_path, LUA_TEMPLATE_PATH)
-        self.template_engine_path = os.path.join(self.template_path, "frameworks/cocos2d-x")
-
     def modify_xcode_proj(self, proj_file_path, language):
         proj_modifier_path = os.path.join(os.path.dirname(__file__), 'proj_modifier')
         sys.path.append(proj_modifier_path)
@@ -45,10 +42,13 @@ class TemplateModifier(object):
 
         if language == "cpp":
             targetName = "HelloCpp"
+            template_engine_path = os.path.join(self.engine_path, "templates/cpp-template-default/cocos2d")
         elif language == "lua":
             targetName = "HelloLua"
+            template_engine_path = os.path.join(self.engine_path, "templates/lua-template-runtime/frameworks/cocos2d-x")
         else:
             targetName = "HelloJavascript"
+            template_engine_path = os.path.join(self.engine_path, "templates/js-template-runtime/js-bindings")
         ios_target_name = "%s iOS" % targetName
         mac_target_name = "%s Mac" % targetName
 
@@ -58,9 +58,9 @@ class TemplateModifier(object):
             pbx_proj.remove_proj_reference("cocos2d_lua_bindings.xcodeproj")
 
         # add libraries search path
-        ios_template_prebuilt_path = os.path.join(self.template_engine_path, IOS_PREBUILT_PATH)
+        ios_template_prebuilt_path = os.path.join(template_engine_path, IOS_PREBUILT_PATH)
         pbx_proj.add_library_search_paths(os.path.relpath(ios_template_prebuilt_path, xcode_proj_path), target_name=ios_target_name, recursive=False)
-        mac_template_prebuilt_path = os.path.join(self.template_engine_path, MAC_PREBUILT_PATH)
+        mac_template_prebuilt_path = os.path.join(template_engine_path, MAC_PREBUILT_PATH)
         pbx_proj.add_library_search_paths(os.path.relpath(mac_template_prebuilt_path, xcode_proj_path), target_name=mac_target_name, recursive=False)
 
         # add libraries for targets
@@ -113,6 +113,8 @@ class TemplateModifier(object):
         copy_libs_cmd = "if not exist \"$(OutDir)\" mkdir \"$(OutDir)\"\n" \
                         "xcopy /Y /Q \"$(EngineRoot)prebuilt\\win32\\*.*\" \"$(OutDir)\"\n"
         vcx_proj.set_event_command("PreLinkEvent", copy_libs_cmd)
+
+        vcx_proj.remove_predefine_macro("_DEBUG")
 
         vcx_proj.save()
 

@@ -22,9 +22,9 @@ from argparse import ArgumentParser
 if sys.platform == 'win32':
     import _winreg
 
-ANDROID_SO_PATH = "frameworks/runtime-src/proj.android/libs"
+SCRIPT_ANDROID_SO_PATH = "frameworks/runtime-src/proj.android/libs"
 ANDROID_A_PATH = "frameworks/runtime-src/proj.android/obj/local"
-MK_PATH = "frameworks/runtime-src/proj.android/jni/Application.mk"
+SCRIPT_MK_PATH = "frameworks/runtime-src/proj.android/jni/Application.mk"
 CONSOLE_PATH = "tools/cocos2d-console/bin"
 
 MAKE_PKG_TOOL_PATH = "tools/make-package/git-archive-all"
@@ -218,7 +218,7 @@ class Generator(object):
         run_shell(create_cmd)
 
         # Add multi ABI in Application.mk
-        mk_file = os.path.join(proj_path, MK_PATH)
+        mk_file = os.path.join(proj_path, SCRIPT_MK_PATH)
         self.modify_mk(mk_file)
 
         # build it
@@ -226,8 +226,8 @@ class Generator(object):
         run_shell(build_cmd)
 
         # copy .so to the template dir
-        libs_dir = os.path.join(proj_path, ANDROID_SO_PATH)
-        target_libs_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "templates", "%s-template-runtime" % language, ANDROID_SO_PATH)
+        libs_dir = os.path.join(proj_path, SCRIPT_ANDROID_SO_PATH)
+        target_libs_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "templates", "%s-template-runtime" % language, SCRIPT_ANDROID_SO_PATH)
         if os.path.exists(target_libs_dir):
             shutil.rmtree(target_libs_dir)
         shutil.copytree(libs_dir, target_libs_dir)
@@ -271,64 +271,76 @@ class Generator(object):
         # remove the project
         shutil.rmtree(proj_path)
 
-        # build so with anysdk for runtime template
-        # self.build_so_for_anysdk(language)
-
     def build_so_for_anysdk(self, language):
-        if language == "js":
-            engine_name = "cocos2d-js"
-            proj_name = "PrebuiltRuntimeJs"
-            pkg_name = "org.cocos2dx.PrebuiltRuntimeJs"
-        else:
+        if language == "cpp":
             engine_name = "cocos2d-x"
-            proj_name = "PrebuiltRuntimeLua"
-            pkg_name = "org.cocos2dx.PrebuiltRuntimeLua"
+            proj_name = "MyCppGame"
+            pkg_name = "org.cocos2dx.MyCppGame"
+            template_name = "default"
+            mk_path = "proj.android/jni/Application.mk"
+            so_path = "proj.android/libs"
+            need_prebuilt_apk = False
+        else:
+            template_name = "runtime"
+            mk_path = SCRIPT_MK_PATH
+            so_path = SCRIPT_ANDROID_SO_PATH
+            need_prebuilt_apk = True
+            if language == "js":
+                engine_name = "cocos2d-js"
+                proj_name = "PrebuiltRuntimeJs"
+                pkg_name = "org.cocos2dx.PrebuiltRuntimeJs"
+            else:
+                engine_name = "cocos2d-x"
+                proj_name = "PrebuiltRuntimeLua"
+                pkg_name = "org.cocos2dx.PrebuiltRuntimeLua"
 
         # copy to tmp dir
         import tempfile
-        tmp_dir = os.path.join(tempfile.gettempdir(), engine_name)
+        tmp_dir = os.path.join(tempfile.gettempdir(), "frameworks")
+        tmp_engine_dir = os.path.join(tmp_dir, engine_name)
         if os.path.exists(tmp_dir):
             shutil.rmtree(tmp_dir)
-        shutil.copytree(os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name), tmp_dir)
+        shutil.copytree(os.path.join(self.root_dir, "gen", "cocos", "frameworks"), tmp_dir)
 
         print("temp dir is %s" % tmp_dir)
 
-        console_dir = os.path.join(tmp_dir, CONSOLE_PATH)
+        console_dir = os.path.join(tmp_engine_dir, CONSOLE_PATH)
         cmd_path = os.path.join(console_dir, "cocos")
-        proj_path = os.path.join(tmp_dir, proj_name)
+        proj_path = os.path.join(tmp_engine_dir, proj_name)
         if os.path.exists(proj_path):
             shutil.rmtree(proj_path)
 
-        # create a runtime project
-        create_cmd = "%s new -l %s -t runtime -p %s -d %s %s" % (cmd_path, language, pkg_name, tmp_dir, proj_name)
+        # create a project
+        create_cmd = "%s new -l %s -t %s -p %s -d %s %s" % (cmd_path, language, template_name, pkg_name, tmp_engine_dir, proj_name)
         run_shell(create_cmd)
 
         # Add multi ABI in Application.mk
-        mk_file = os.path.join(proj_path, MK_PATH)
+        mk_file = os.path.join(proj_path, mk_path)
         self.modify_mk(mk_file)
 
         # build it with release mode to get the so file
-        build_cmd = "%s compile -s %s -p android --ndk-mode release -j 4" % (cmd_path, proj_path)
+        build_cmd = "%s compile -s %s -p android --ndk-mode release" % (cmd_path, proj_path)
         run_shell(build_cmd)
 
         # copy .so to the template dir
-        libs_dir = os.path.join(proj_path, ANDROID_SO_PATH)
-        target_libs_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "templates", "%s-template-runtime" % language, ANDROID_SO_PATH)
+        libs_dir = os.path.join(proj_path, so_path)
+        target_libs_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "templates", "%s-template-%s" % (language, template_name), so_path)
         if os.path.exists(target_libs_dir):
             shutil.rmtree(target_libs_dir)
         shutil.copytree(libs_dir, target_libs_dir)
 
-        # build it with debug mode to get the prebuilt apk
-        build_cmd = "%s compile -s %s -p android --no-res -j 4" % (cmd_path, proj_path)
-        run_shell(build_cmd)
+        if need_prebuilt_apk:
+            # build it with debug mode to get the prebuilt apk
+            build_cmd = "%s compile -s %s -p android --no-res -j 4" % (cmd_path, proj_path)
+            run_shell(build_cmd)
 
-        # copy the apk into template dir
-        apk_dir = os.path.join(proj_path, "runtime", "android", "%s-debug.apk" % proj_name)
-        target_apk_path = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "templates", "%s-template-runtime" % language, "runtime", "android", "%s.apk" % proj_name)
-        if os.path.exists(target_apk_path):
-            os.remove(target_apk_path)
-        shutil.copy(apk_dir, os.path.dirname(target_apk_path))
-        os.rename(os.path.join(os.path.dirname(target_apk_path), "%s-debug.apk" % proj_name), target_apk_path)
+            # copy the apk into template dir
+            apk_dir = os.path.join(proj_path, "runtime", "android", "%s-debug.apk" % proj_name)
+            target_apk_path = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "templates", "%s-template-runtime" % language, "runtime", "android", "%s.apk" % proj_name)
+            if os.path.exists(target_apk_path):
+                os.remove(target_apk_path)
+            shutil.copy(apk_dir, os.path.dirname(target_apk_path))
+            os.rename(os.path.join(os.path.dirname(target_apk_path), "%s-debug.apk" % proj_name), target_apk_path)
 
         # remove the temp dir
         shutil.rmtree(tmp_dir)
@@ -570,8 +582,11 @@ class Generator(object):
         if not self.no_android:
             if self.gen_x:
                 self.build_android("lua")
+                self.build_so_for_anysdk("lua")
+                self.build_so_for_anysdk("cpp")
             if self.gen_js:
                 self.build_android("js")
+                self.build_so_for_anysdk("js")
 
     def clean_gen(self):
         gen_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks")

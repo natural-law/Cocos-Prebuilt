@@ -173,3 +173,25 @@ class VCXProject(object):
             proj_refers = item.getElementsByTagName("ProjectReference")
             if len(proj_refers) > 0:
                 self.root_node.removeChild(item)
+
+    def remove_predefine_macro(self, macro, config=None):
+        cfg_nodes = self.root_node.getElementsByTagName("ItemDefinitionGroup")
+        for cfg_node in cfg_nodes:
+            cond_attr = cfg_node.attributes["Condition"].value
+            if cond_attr.lower().find("debug") >= 0:
+                cur_mode = "Debug"
+            else:
+                cur_mode = "Release"
+
+            if (config is not None) and (cur_mode.lower() != config.lower()):
+                continue
+
+            compile_node = self.get_or_create_node(cfg_node, "ClCompile")
+            predefine_node = self.get_or_create_node(compile_node, "PreprocessorDefinitions")
+            defined_values = predefine_node.firstChild.nodeValue
+
+            defined_list = defined_values.split(";")
+            if macro in defined_list:
+                defined_list.remove(macro)
+                new_value = ";".join(defined_list)
+                predefine_node.firstChild.nodeValue = new_value
