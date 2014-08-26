@@ -118,7 +118,13 @@ public class AppActivity extends Cocos2dxActivity{
 	        }  
 	        return false;  
 	    } 
-	 
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+		super.onActivityResult(requestCode, resultCode, data);
+		PluginWrapper.onActivityResult(requestCode, resultCode, data);
+	}
+
 	public String getHostIpAddress() {
 		WifiManager wifiMgr = (WifiManager) getSystemService(WIFI_SERVICE);
 		WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
