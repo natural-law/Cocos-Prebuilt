@@ -272,27 +272,17 @@ class Generator(object):
         shutil.rmtree(proj_path)
 
     def build_so_for_anysdk(self, language):
-        if language == "cpp":
-            engine_name = "cocos2d-x"
-            proj_name = "MyCppGame"
-            pkg_name = "org.cocos2dx.MyCppGame"
-            template_name = "default"
-            mk_path = "proj.android/jni/Application.mk"
-            so_path = "proj.android/libs"
-            need_prebuilt_apk = False
+        template_name = "runtime"
+        mk_path = SCRIPT_MK_PATH
+        so_path = SCRIPT_ANDROID_SO_PATH
+        if language == "js":
+            engine_name = "cocos2d-js"
+            proj_name = "PrebuiltRuntimeJs"
+            pkg_name = "org.cocos2dx.PrebuiltRuntimeJs"
         else:
-            template_name = "runtime"
-            mk_path = SCRIPT_MK_PATH
-            so_path = SCRIPT_ANDROID_SO_PATH
-            need_prebuilt_apk = True
-            if language == "js":
-                engine_name = "cocos2d-js"
-                proj_name = "PrebuiltRuntimeJs"
-                pkg_name = "org.cocos2dx.PrebuiltRuntimeJs"
-            else:
-                engine_name = "cocos2d-x"
-                proj_name = "PrebuiltRuntimeLua"
-                pkg_name = "org.cocos2dx.PrebuiltRuntimeLua"
+            engine_name = "cocos2d-x"
+            proj_name = "PrebuiltRuntimeLua"
+            pkg_name = "org.cocos2dx.PrebuiltRuntimeLua"
 
         # copy to tmp dir
         import tempfile
@@ -329,18 +319,17 @@ class Generator(object):
             shutil.rmtree(target_libs_dir)
         shutil.copytree(libs_dir, target_libs_dir)
 
-        if need_prebuilt_apk:
-            # build it with debug mode to get the prebuilt apk
-            build_cmd = "%s compile -s %s -p android --no-res -j 4" % (cmd_path, proj_path)
-            run_shell(build_cmd)
+        # build it with debug mode to get the prebuilt apk
+        build_cmd = "%s compile -s %s -p android --no-res -j 4" % (cmd_path, proj_path)
+        run_shell(build_cmd)
 
-            # copy the apk into template dir
-            apk_dir = os.path.join(proj_path, "runtime", "android", "%s-debug.apk" % proj_name)
-            target_apk_path = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "templates", "%s-template-runtime" % language, "runtime", "android", "%s.apk" % proj_name)
-            if os.path.exists(target_apk_path):
-                os.remove(target_apk_path)
-            shutil.copy(apk_dir, os.path.dirname(target_apk_path))
-            os.rename(os.path.join(os.path.dirname(target_apk_path), "%s-debug.apk" % proj_name), target_apk_path)
+        # copy the apk into template dir
+        apk_dir = os.path.join(proj_path, "runtime", "android", "%s-debug.apk" % proj_name)
+        target_apk_path = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "templates", "%s-template-runtime" % language, "runtime", "android", "%s.apk" % proj_name)
+        if os.path.exists(target_apk_path):
+            os.remove(target_apk_path)
+        shutil.copy(apk_dir, os.path.dirname(target_apk_path))
+        os.rename(os.path.join(os.path.dirname(target_apk_path), "%s-debug.apk" % proj_name), target_apk_path)
 
         # remove the temp dir
         shutil.rmtree(tmp_dir)
@@ -583,7 +572,6 @@ class Generator(object):
             if self.gen_x:
                 self.build_android("lua")
                 self.build_so_for_anysdk("lua")
-                self.build_so_for_anysdk("cpp")
             if self.gen_js:
                 self.build_android("js")
                 self.build_so_for_anysdk("js")

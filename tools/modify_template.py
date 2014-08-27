@@ -90,6 +90,11 @@ class TemplateModifier(object):
             mac_lib_path = os.path.join(os.path.relpath(mac_template_prebuilt_path, xcode_proj_path), lib)
             pbx_proj.add_file_if_doesnt_exist(mac_lib_path, mac_lib_group, tree="<group>", target=mac_target_name)
 
+        # add main.json to the xcode project of cpp template
+        if language == "cpp":
+            res_group = pbx_proj.get_or_create_group("Resources")
+            pbx_proj.add_file_if_doesnt_exist("main.json", res_group, tree="<group>")
+
         if pbx_proj.modified:
             pbx_proj.save()
 
