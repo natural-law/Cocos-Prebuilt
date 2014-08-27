@@ -581,6 +581,38 @@ class Generator(object):
         if os.path.exists(gen_dir):
             shutil.rmtree(gen_dir)
 
+    def write_version(self, engine_name):
+        src_engine_path = os.path.join(self.root_dir, engine_name)
+        if engine_name == "cocos2d-x":
+            file_path = os.path.join(src_engine_path, "cocos/cocos2d.cpp")
+            pattern = r".*return[ \t]+\"(.*)\";"
+        else:
+            file_path = os.path.join(src_engine_path, "frameworks/js-bindings/bindings/manual/ScriptingCore.h")
+            pattern = r".*#define[ \t]+ENGINE_VERSION[ \t]+\"(.*)\""
+
+        # restore the version of engine
+        ver = ""
+        f = open(file_path)
+        import re
+        for line in f.readlines():
+            match = re.match(pattern, line)
+            if match:
+                ver = match.group(1)
+                break
+        f.close()
+
+        if len(ver) <= 0:
+            raise Exception("Can't find version in %s" % file_path)
+        else:
+            engine_path = os.path.join(self.root_dir, "gen/cocos/frameworks", engine_name)
+            dst_file = os.path.join(engine_path, "version")
+            dst_dir = os.path.dirname(dst_file)
+            if not os.path.exists(dst_dir):
+                os.makedirs(dst_dir)
+            f = open(dst_file, "w")
+            f.write(ver)
+            f.close()
+
     def do_generate(self):
         if self.need_clean:
             # clean the files generated before
@@ -595,11 +627,17 @@ class Generator(object):
                 if not os.path.exists(x_win32_dir):
                     os.makedirs(x_win32_dir)
 
+                # write the version info of engine
+                self.write_version("cocos2d-x")
+
             if self.gen_js:
                 # create win32 directory in -js engine
                 js_win32_dir = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-js/frameworks/js-bindings/cocos2d-x/prebuilt/win32")
                 if not os.path.exists(js_win32_dir):
                     os.makedirs(js_win32_dir)
+
+                # write the version info of engine
+                self.write_version("cocos2d-js")
 
         self.build_all_libs()
 
