@@ -116,7 +116,7 @@ class Generator(object):
             if self.js_repo_path is not None:
                 self.gen_engine_from_repo(self.js_repo_path, "cocos2d-js")
             elif not os.path.exists(os.path.join(self.root_dir, "cocos2d-js")):
-                raise Exception("cocos2d-js is not existed, please specify cocos2d-js repo path by \"-js\".")
+                raise Exception("cocos2d-js is not existed, please specify cocos2d-js repo path by \"-j\".")
 
         self.load_config()
 

@@ -2,7 +2,7 @@
 tools/.idea/*
 
 # generated files
-gen/*
+gen*/*
 tools/build/*
 *.pyc
 cocos2d-x/*
