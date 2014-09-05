@@ -493,9 +493,9 @@
 						<key>IFPkgDescriptionDeleteWarning</key>
 						<string></string>
 						<key>IFPkgDescriptionDescription</key>
-						<string>Cocos Engine include cocos2d-x &amp; Cocos Code IDE inside.</string>
+						<string>Cocos Creator include cocos2d-x, Cocos Code IDE, AnySDK, Cocos Studio, Cocos Launcher inside.</string>
 						<key>IFPkgDescriptionTitle</key>
-						<string>Cocos Engine</string>
+						<string>Cocos Creator</string>
 						<key>IFPkgDescriptionVersion</key>
 						<string>3.1</string>
 					</dict>
@@ -509,9 +509,9 @@
 					<key>CFBundleIconFile Path Type</key>
 					<integer>2</integer>
 					<key>CFBundleIdentifier</key>
-					<string>org.cocos.engine</string>
+					<string>org.cocos.creator</string>
 					<key>CFBundleName</key>
-					<string>Cocos Engine</string>
+					<string>Cocos Creator</string>
 					<key>CFBundleShortVersionString</key>
 					<string>3.1</string>
 				</dict>
@@ -548,7 +548,7 @@
 		<key>IFPkgFlagPackageSelection</key>
 		<integer>0</integer>
 		<key>Name</key>
-		<string>Cocos Engine</string>
+		<string>Cocos Creator</string>
 		<key>Status</key>
 		<integer>1</integer>
 		<key>Type</key>
