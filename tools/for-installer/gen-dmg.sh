@@ -9,6 +9,8 @@ WIN_HEIGHT=410
 BASEDIR="$( cd "$( dirname "$0" )" && pwd )"
 RELEASE_DIR="${BASEDIR}/../../release"
 PKG_FILE_PATH="${RELEASE_DIR}/${PROJ_NAME}.pkg"
+SIGNED_PKG_NAME="${PROJ_NAME}_signed.pkg"
+UNSIGNED_PKG_NAME="${PROJ_NAME}_unsigned.pkg"
 
 #check if the app is exist
 if [ ! -d "${PKG_FILE_PATH}" ]; then
@@ -34,8 +36,15 @@ if [ -f "${NEED_REMOVE_FILE}" ]; then
     rm -rf "${NEED_REMOVE_FILE}"
 fi
 
+# sign the pkg
+productsign --sign "3rd Party Mac Developer Application: CocoaChina (U7E7529TA5)" "${TMP_DIR}/${PROJ_NAME}.pkg" "${TMP_DIR}/${SIGNED_PKG_NAME}"
+
+# rename the pkg files
+mv "${TMP_DIR}/${PROJ_NAME}.pkg" "${TMP_DIR}/${UNSIGNED_PKG_NAME}"
+mv "${TMP_DIR}/${SIGNED_PKG_NAME}" "${TMP_DIR}/${PROJ_NAME}.pkg"
+
 # create dmg file
-pushd /tmp
+pushd "${TMP_DIR}"
 
 "${BASEDIR}/create-dmg/create-dmg" \
     --window-size ${WIN_WIDTH} ${WIN_HEIGHT} \
@@ -44,7 +53,7 @@ pushd /tmp
     --background "${RES_DIR}/dmg_background.jpg" \
     --icon-size 192 \
     --icon "${PROJ_NAME}.pkg" 590 165 \
-    "${PROJ_NAME}.dmg" "${TMP_DIR}/${PROJ_NAME}.pkg"
+    "${TARGET_NAME}" "${TMP_DIR}/${PROJ_NAME}.pkg"
 
 popd
 
@@ -58,8 +67,7 @@ if [ -f "${RELEASE_DIR}/${TARGET_NAME}" ]; then
 fi
 
 # copy the dmg file from tmp to release dir
-cp "/tmp/${TARGET_NAME}" "${RELEASE_DIR}"
+cp "${TMP_DIR}/${TARGET_NAME}" "${RELEASE_DIR}"
 
 # remove temp files
 rm -rf "${TMP_DIR}"
-rm "/tmp/${TARGET_NAME}"

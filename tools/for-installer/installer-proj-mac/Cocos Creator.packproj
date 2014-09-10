@@ -503,7 +503,7 @@
 				<key>Display Information</key>
 				<dict>
 					<key>CFBundleGetInfoString</key>
-					<string>Cocos Engine 3.1 Copyrights © 2014 Chukong-inc</string>
+					<string>Cocos Creator 3.1 Copyrights © 2014 Chukong-inc</string>
 					<key>CFBundleIconFile</key>
 					<string>resources/Icon.icns</string>
 					<key>CFBundleIconFile Path Type</key>
