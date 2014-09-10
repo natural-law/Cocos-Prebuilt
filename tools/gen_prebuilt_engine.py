@@ -632,7 +632,7 @@ class Generator(object):
 
             if self.gen_js:
                 # create win32 directory in -js engine
-                js_win32_dir = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-js/frameworks/js-bindings/cocos2d-x/prebuilt/win32")
+                js_win32_dir = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-js/frameworks/js-bindings/prebuilt/win32")
                 if not os.path.exists(js_win32_dir):
                     os.makedirs(js_win32_dir)
 
