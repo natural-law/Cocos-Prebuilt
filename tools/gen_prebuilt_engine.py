@@ -122,7 +122,8 @@ class Generator(object):
 
     def load_config(self):
         self.copy_cfg = []
-        self.android_mks = []
+        self.x_android_mks = []
+        self.js_android_mks = []
         self.xcode_proj_info = {}
         self.win32_proj_info = {}
         if self.gen_x:
@@ -132,7 +133,7 @@ class Generator(object):
             x_cfg_info = json.load(f)
             f.close()
             self.copy_cfg += x_cfg_info[Generator.KEY_COPY_CFG]
-            self.android_mks += x_cfg_info[Generator.KEY_ANDROID_MKS]
+            self.x_android_mks += x_cfg_info[Generator.KEY_ANDROID_MKS]
             for key in x_cfg_info[Generator.KEY_XCODE_PROJ_INFO].keys():
                 self.xcode_proj_info[key] = x_cfg_info[Generator.KEY_XCODE_PROJ_INFO][key]
 
@@ -146,7 +147,7 @@ class Generator(object):
             js_cfg_info = json.load(f)
             f.close()
             self.copy_cfg += js_cfg_info[Generator.KEY_COPY_CFG]
-            self.android_mks += js_cfg_info[Generator.KEY_ANDROID_MKS]
+            self.js_android_mks += js_cfg_info[Generator.KEY_ANDROID_MKS]
             for key in js_cfg_info[Generator.KEY_XCODE_PROJ_INFO].keys():
                 self.xcode_proj_info[key] = js_cfg_info[Generator.KEY_XCODE_PROJ_INFO][key]
 
@@ -184,6 +185,26 @@ class Generator(object):
     def copy_files(self):
         for cfg in self.copy_cfg:
             excopy.copy_files_with_config(cfg, self.root_dir, self.root_dir)
+
+    def gen_prebuilt_mk(self, language):
+        if language == "js":
+            engine_name = "cocos2d-js"
+            prebuilt_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "frameworks", "js-bindings", "cocos2d-x", "prebuilt", "android")
+            android_mks = self.js_android_mks
+        else:
+            engine_name = "cocos2d-x"
+            prebuilt_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "prebuilt", "android")
+            android_mks = self.x_android_mks
+
+        # modify the mk files to prebuilt version
+        import gen_prebuilt_mk
+        for mk_file in android_mks:
+            mk_file_path = os.path.join(self.root_dir, mk_file)
+            dst_file_path = os.path.join(os.path.dirname(mk_file_path), "prebuilt-mk", os.path.basename(mk_file_path))
+            tmp_obj = gen_prebuilt_mk.MKGenerator(mk_file_path, prebuilt_dir, dst_file_path)
+            tmp_obj.do_generate()
+
+            os.remove(mk_file_path)
 
     def modify_mk(self, mk_file):
         if os.path.isfile(mk_file):
@@ -260,13 +281,6 @@ class Generator(object):
             if os.path.exists(strip_cmd_path):
                 strip_cmd = "%s -S %s/armeabi*/*.a" % (strip_cmd_path, prebuilt_dir)
                 run_shell(strip_cmd)
-
-        # modify the mk files to prebuilt version
-        import gen_prebuilt_mk
-        for mk_file in self.android_mks:
-            mk_file_path = os.path.join(self.root_dir, mk_file)
-            tmp_obj = gen_prebuilt_mk.MKGenerator(mk_file_path, prebuilt_dir, mk_file_path)
-            tmp_obj.do_generate()
 
         # remove the project
         shutil.rmtree(proj_path)
@@ -629,6 +643,7 @@ class Generator(object):
 
                 # write the version info of engine
                 self.write_version("cocos2d-x")
+                self.gen_prebuilt_mk("lua")
 
             if self.gen_js:
                 # create win32 directory in -js engine
@@ -638,6 +653,7 @@ class Generator(object):
 
                 # write the version info of engine
                 self.write_version("cocos2d-js")
+                self.gen_prebuilt_mk("js")
 
         self.build_all_libs()
 

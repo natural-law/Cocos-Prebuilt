@@ -48,5 +48,5 @@ LOCAL_WHOLE_STATIC_LIBRARIES += PluginProtocolStatic
 
 include $(BUILD_SHARED_LIBRARY)
 
-$(call import-module,scripting/lua-bindings)
+$(call import-module,scripting/lua-bindings/prebuilt-mk)
 $(call import-module,anysdk/android)

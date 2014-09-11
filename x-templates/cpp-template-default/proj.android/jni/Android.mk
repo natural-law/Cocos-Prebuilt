@@ -30,13 +30,13 @@ LOCAL_WHOLE_STATIC_LIBRARIES += cocostudio_static
 
 include $(BUILD_SHARED_LIBRARY)
 
-$(call import-module,.)
-$(call import-module,audio/android)
+$(call import-module,./prebuilt-mk)
+$(call import-module,audio/android/prebuilt-mk)
 $(call import-module,anysdk/android)
-$(call import-module,editor-support/cocostudio)
+$(call import-module,editor-support/cocostudio/prebuilt-mk)
 
-# $(call import-module,Box2D)
-# $(call import-module,editor-support/cocosbuilder)
-# $(call import-module,editor-support/spine)
-# $(call import-module,network)
-# $(call import-module,extensions)
+# $(call import-module,Box2D/prebuilt-mk)
+# $(call import-module,editor-support/cocosbuilder/prebuilt-mk)
+# $(call import-module,editor-support/spine/prebuilt-mk)
+# $(call import-module,network/prebuilt-mk)
+# $(call import-module,extensions/prebuilt-mk)
