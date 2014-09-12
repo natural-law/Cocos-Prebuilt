@@ -591,9 +591,23 @@ class Generator(object):
                 self.build_so_for_anysdk("js")
 
     def clean_gen(self):
-        gen_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks")
-        if os.path.exists(gen_dir):
-            shutil.rmtree(gen_dir)
+        if self.gen_x:
+            gen_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", "cocos2d-x")
+            if os.path.exists(gen_dir):
+                shutil.rmtree(gen_dir)
+
+            src_dir = os.path.join(self.root_dir, "gen-src", "cocos", "frameworks", "cocos2d-x")
+            if os.path.exists(src_dir):
+                shutil.rmtree(src_dir)
+
+        if self.gen_js:
+            gen_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", "cocos2d-js")
+            if os.path.exists(gen_dir):
+                shutil.rmtree(gen_dir)
+
+            src_dir = os.path.join(self.root_dir, "gen-src", "cocos", "frameworks", "cocos2d-js")
+            if os.path.exists(src_dir):
+                shutil.rmtree(src_dir)
 
     def write_version(self, engine_name):
         src_engine_path = os.path.join(self.root_dir, engine_name)

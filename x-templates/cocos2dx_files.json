@@ -4,7 +4,8 @@
         "cocos",
         "extensions",
         "external",
-        "plugin"
+        "plugin",
+        "build"
     ], 
     "lua": [
     ]
