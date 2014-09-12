@@ -45,11 +45,21 @@ SetupIconFile=resources\Icon.ico
 WizardImageFile=resources\wizard.bmp
 WizardSmallImageFile=resources\smallicon.bmp
 
+[Types]
+Name: "full"; Description: "Full installation"
+Name: "compact"; Description: "Compact installation"
+Name: "custom"; Description: "Custom installation"; Flags: iscustom
+
+[Components]
+Name: "creator"; Description: "Applications & prebuilt engine"; Types: full compact custom; Flags: fixed
+Name: "sourcecode"; Description: "Source code of engine";  Types: full
+
 [Files]
-Source: "{#MyRootDir}\gen\cocos\frameworks\*"; DestDir: "{app}\frameworks"; Excludes: ".DS_Store"; Flags: recursesubdirs
-Source: "{#MyRootDir}\gen-win32\{#BitFlag}\*"; DestDir: "{app}"; Excludes: ".DS_Store"; Flags: recursesubdirs
-Source: "{#MyRootDir}\gen-win32\{#StudioInstaller}"; DestDir: "{tmp}"
-Source: "resources\{#RunFirstBat}"; DestDir: "{tmp}"
+Source: "{#MyRootDir}\gen\cocos\frameworks\*"; DestDir: "{app}\frameworks"; Excludes: ".DS_Store"; Flags: recursesubdirs; Components: creator
+Source: "{#MyRootDir}\gen-win32\{#BitFlag}\*"; DestDir: "{app}"; Excludes: ".DS_Store"; Flags: recursesubdirs; Components: creator
+Source: "{#MyRootDir}\gen-win32\{#StudioInstaller}"; DestDir: "{tmp}"; Components: creator
+Source: "resources\{#RunFirstBat}"; DestDir: "{tmp}"; Components: creator
+Source: "{#MyRootDir}\gen-src\cocos\*"; DestDir: "{app}"; Flags: recursesubdirs; Components: sourcecode
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -77,3 +87,7 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 
 [UninstallRun]
 Filename: "{app}\Cocos Studio\InstallData\uninstall.exe"; Parameters: """/U:{app}\Cocos Studio\InstallData\uninstall.xml"" /S"; Flags: skipifdoesntexist
+
+[UninstallDelete]
+Type: filesandordirs; Name: "{app}\Cocos Studio"
+
