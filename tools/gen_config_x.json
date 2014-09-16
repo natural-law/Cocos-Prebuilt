@@ -84,6 +84,13 @@
             ]
         },
         {
+            "from": "cocos2d-x",
+            "to": "gen/cocos/frameworks/cocos2d-x",
+            "include": [
+                "setup.py$"
+            ]
+        },
+        {
             "from": "cocos2d-x/cocos",
             "to": "gen/cocos/frameworks/cocos2d-x/cocos",
             "exclude": [

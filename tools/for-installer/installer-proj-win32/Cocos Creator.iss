@@ -19,6 +19,8 @@
 #define AnySDKPath "AnySDK\bin\AnySDK.exe"
 #define AnySDKExeName "AnySDK.exe"
 
+#define PythonDir "tools\Python27"
+
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -80,9 +82,13 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\Cocos Code IDE.exe"; Filename: "{app}\{#IDEPath}"; Tasks: desktopicon
 Name: "{commondesktop}\AnySDK.exe"; Filename: "{app}\{#AnySDKPath}"; Tasks: desktopicon
 
+[Registry]
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}\{#PythonDir}"; Check: NeedsAddPath('{app}\{#PythonDir}')
+
 [Run]
 Filename: "{tmp}\{#RunFirstBat}"; Parameters: """{tmp}\{#StudioSetupINI}"" ""{app}\Cocos Studio"""; StatusMsg: "Writing configuration..."
 Filename: "{tmp}\{#StudioInstaller}"; Parameters: """/S:{tmp}\{#StudioSetupINI}"" /NOINIT"; StatusMsg: "Installing Cocos Studio..."
+Filename: "{app}\{#PythonDir}\python.exe"; Parameters: """{app}\frameworks\cocos2d-x\setup.py"" -a """" -n """" -t """""
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyExeName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
@@ -90,4 +96,23 @@ Filename: "{app}\Cocos Studio\InstallData\uninstall.exe"; Parameters: """/U:{app
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\Cocos Studio"
+Type: filesandordirs; Name: "{app}\tools"
+
+[Code]
+
+function NeedsAddPath(Param: string): boolean;
+var
+  OrigPath: string;
+begin
+  if not RegQueryStringValue(HKEY_LOCAL_MACHINE,
+    'SYSTEM\CurrentControlSet\Control\Session Manager\Environment',
+    'Path', OrigPath)
+  then begin
+    Result := True;
+    exit;
+  end;
+  // look for the path with leading and trailing semicolon
+  // Pos() returns 0 if not found
+  Result := Pos(';' + Param + ';', ';' + OrigPath + ';') = 0;
+end;
 
