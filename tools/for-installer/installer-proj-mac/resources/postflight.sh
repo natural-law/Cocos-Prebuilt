@@ -17,4 +17,4 @@ fi
 SETUP_PY="${INSATLL_DIR}/frameworks/cocos2d-x/setup.py"
 python "${SETUP_PY}" -a "${INSATLL_DIR}/tools/android-sdk" -n "${INSATLL_DIR}/tools/android-ndk-r9d" -t "${INSATLL_DIR}/tools/ant/bin"
 
-open "${INSATLL_DIR}"
+open "${INSATLL_DIR}/Cocos Studio.app"

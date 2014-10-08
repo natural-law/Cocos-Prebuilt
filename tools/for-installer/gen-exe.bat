@@ -1,3 +1,3 @@
 @echo off
-@iscc /dBitFlag=64bit "%~dp0/installer-proj-win32/Cocos Creator.iss"
-@iscc /dBitFlag=32bit "%~dp0/installer-proj-win32/Cocos Creator.iss"
+@makensis /V4 /DBitFlag=64bit "%~dp0/installer-proj-win32/cocos.nsi"
+@makensis /V4 /DBitFlag=32bit "%~dp0/installer-proj-win32/cocos.nsi"
