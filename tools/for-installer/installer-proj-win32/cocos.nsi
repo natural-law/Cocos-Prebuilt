@@ -8,7 +8,6 @@
 !define JDKInstaller jdk.exe
 !define StudioInstaller "CocosStudio.exe"
 !define StudioSetupINI "studiosetup.ini"
-!define SDKZipFile "android-sdk.zip"
 !define NDKZipFile "android-ndk-r9d.zip"
 !define JavaHome "C:\Program Files\Java\jdk1.6.0_45"
 !define ToolsDir "$INSTDIR\tools"
@@ -20,7 +19,7 @@
 !include "StrFunc.nsh"
 !include "MUI.nsh"
 
-# Declare used functions
+; Declare used functions
 ${StrLoc}
 
 Name "${PRODUCTNAME}"                                            ; The name of the installer
@@ -45,7 +44,6 @@ UninstallIcon resources\icon.ico
 ;--------------------------------
 ; Pages
 
-  !insertmacro MUI_PAGE_WELCOME
   !insertmacro MUI_PAGE_LICENSE "..\resources-common\license.txt"
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
@@ -97,7 +95,6 @@ Section "Applications & Prebuilt Engine"
   SetOutPath $TEMP
   File "resources\${RunFirstBat}"
   File "${ROOTPATH}\gen-win32\${StudioInstaller}"
-  File "${ROOTPATH}\gen-win32\${SDKZipFile}"
   File "${ROOTPATH}\gen-win32\${BitFlag}\${JDKInstaller}"
   File "${ROOTPATH}\gen-win32\${BitFlag}\${NDKZipFile}"
 
@@ -110,7 +107,6 @@ Section "Applications & Prebuilt Engine"
 
   ; unzip the android SDK & NDK
   InitPluginsDir
-  nsisunz::UnzipToLog "$TEMP\${SDKZipFile}" "${ToolsDir}"
   nsisunz::UnzipToLog "$TEMP\${NDKZipFile}" "${ToolsDir}"
 
   ; remove temp files
@@ -118,7 +114,6 @@ Section "Applications & Prebuilt Engine"
   Delete "$TEMP\${StudioSetupINI}"
   Delete "$TEMP\${JDKInstaller}"
   Delete "$TEMP\${StudioInstaller}"
-  Delete "$TEMP\${SDKZipFile}"
   Delete "$TEMP\${NDKZipFile}"
 
   ; Modify Registry
@@ -131,7 +126,7 @@ Section "Applications & Prebuilt Engine"
   Call AddPath
 
   ; invoke the setup.py
-  ExecWait '"${ToolsDir}\Python27\python.exe" "${XDir}\setup.py" -a "${ToolsDir}\android-sdk" -n "${ToolsDir}\android-ndk-r9d" -t "${ToolsDir}\ant\bin"'
+  ExecWait '"${ToolsDir}\Python27\python.exe" "${XDir}\setup.py" -a "" -n "${ToolsDir}\android-ndk-r9d" -t "${ToolsDir}\ant\bin"'
 
   ; creat desktop icon
   CreateShortCut "$desktop\Cocos Launcher.lnk" "${StudioDir}\CocosStudio.Launcher.exe"
@@ -168,6 +163,6 @@ Section "Uninstall"
 SectionEnd
 
 Function LaunchLink
-  ExecShell "" "$desktop\Cocos Launcher.lnk"
+  ExecShell "" "${StudioDir}\CocosStudio.Launcher.exe"
 FunctionEnd
 
