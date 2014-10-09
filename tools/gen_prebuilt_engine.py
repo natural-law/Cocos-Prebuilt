@@ -209,7 +209,7 @@ class Generator(object):
     def modify_mk(self, mk_file):
         if os.path.isfile(mk_file):
             file_obj = open(mk_file, "a")
-            file_obj.write("\nAPP_ABI :=armeabi armeabi-v7a\n")
+            file_obj.write("\nAPP_ABI :=armeabi armeabi-v7a x86\n")
             file_obj.close()
 
     def is_32bit_windows(self):
@@ -277,9 +277,16 @@ class Generator(object):
             elif os_is_mac():
                 sys_folder_name = "darwin-x86_64"
 
+            # strip arm libs
             strip_cmd_path = os.path.join(ndk_root, "toolchains/arm-linux-androideabi-4.8/prebuilt/%s/arm-linux-androideabi/bin/strip" % sys_folder_name)
             if os.path.exists(strip_cmd_path):
                 strip_cmd = "%s -S %s/armeabi*/*.a" % (strip_cmd_path, prebuilt_dir)
+                run_shell(strip_cmd)
+
+            # strip x86 libs
+            strip_cmd_path = os.path.join(ndk_root, "toolchains/x86-4.8/prebuilt/%s/i686-linux-android/bin/strip" % sys_folder_name)
+            if os.path.exists(strip_cmd_path):
+                strip_cmd = "%s -S %s/x86/*.a" % (strip_cmd_path, prebuilt_dir)
                 run_shell(strip_cmd)
 
         # remove the project
