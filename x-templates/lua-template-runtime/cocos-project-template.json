@@ -83,20 +83,6 @@
             "from": ".",
             "to": "frameworks/cocos2d-x"
         },
-        "append_dir": [
-            {
-                "from": "../anysdk",
-                "to": "frameworks/anysdk",
-                "exclude": [
-                    "res/*",
-                    "js-bindings/*"
-                ]
-            },
-            {
-                "from": "../anysdk/res",
-                "to": "frameworks/runtime-src/proj.android/res"
-            }
-        ],
         "project_rename": {
             "src_project_name": "HelloLua",
             "files": [

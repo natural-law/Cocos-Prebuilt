@@ -4,21 +4,6 @@
             "from":".",
             "to":"cocos2d"
          },
-         "append_dir": [
-            {
-                "from": "../anysdk",
-                "to": "anysdk",
-                "exclude": [
-                    "res/*",
-                    "js-bindings/*",
-                    "lua-bindings/*"
-                ]
-            },
-            {
-                "from": "../anysdk/res",
-                "to": "proj.android/res"
-            }
-         ],
          "project_rename":{
             "src_project_name":"HelloCpp",
             "files":[

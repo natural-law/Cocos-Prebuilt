@@ -44,6 +44,7 @@ UninstallIcon resources\icon.ico
 ; Pages
 
   !insertmacro MUI_PAGE_LICENSE "..\resources-common\license.txt"
+  !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
  
@@ -54,6 +55,10 @@ UninstallIcon resources\icon.ico
     !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchLink"
   !insertmacro MUI_PAGE_FINISH
  
+
+  !insertmacro MUI_UNPAGE_CONFIRM
+  !insertmacro MUI_UNPAGE_INSTFILES
+
 ;Languages
 !insertmacro MUI_LANGUAGE "English"
 
@@ -77,7 +82,10 @@ FunctionEnd
 ;--------------------------------
 ; The stuff to install
 ; Section 1
-Section "Applications & Prebuilt Engine"
+Section "Applications & Framework"
+
+  SectionIn RO
+
   ; install frameworks
   SetOutPath "$INSTDIR\frameworks"
   File /r /x .DS_Store "${ROOTPATH}\gen\cocos\frameworks\*.*"
@@ -127,14 +135,14 @@ Section "Applications & Prebuilt Engine"
 
   ; creat desktop icon
   CreateShortCut "$desktop\Cocos Launcher.lnk" "${StudioDir}\CocosStudio.Launcher.exe"
-  CreateShortCut "$desktop\AnySDK.lnk" "$INSTDIR\AnySDK\bin\AnySDK.exe"
+  ; CreateShortCut "$desktop\AnySDK.lnk" "$INSTDIR\AnySDK\bin\AnySDK.exe"
   CreateShortCut "$desktop\Cocos Code IDE.lnk" "$INSTDIR\IDE\Cocos Code IDE.exe"
 
   WriteUninstaller $INSTDIR\uninstaller.exe
 SectionEnd
 
 ; Section 2
-Section "Source Code"
+Section /o "Source Code"
 
   ; Set output path to the installation directory.
   SetOutPath $INSTDIR
@@ -152,7 +160,7 @@ Section "Uninstall"
   Delete "$INSTDIR\uninstaller.exe"
 
   ; delete desktop icon
-  Delete "$desktop\AnySDK.lnk"
+  ; Delete "$desktop\AnySDK.lnk"
   Delete "$desktop\Cocos Code IDE.lnk"
   Delete "$desktop\Cocos Launcher.lnk"
 

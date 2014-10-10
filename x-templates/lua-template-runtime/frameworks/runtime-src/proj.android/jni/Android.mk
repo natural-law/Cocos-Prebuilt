@@ -30,23 +30,19 @@ LOCAL_SRC_FILES := \
 ../../Classes/AppDelegate.cpp \
 ../../Classes/ConfigParser.cpp \
 lua/Runtime_android.cpp \
-lua/main.cpp \
-../../../anysdk/lua-bindings/src/anysdkbindings.cpp \
-../../../anysdk/lua-bindings/src/anysdk_manual_bindings.cpp
+lua/main.cpp
 
 
 LOCAL_C_INCLUDES := \
 $(LOCAL_PATH)/../../Classes/protobuf-lite \
 $(LOCAL_PATH)/../../Classes/runtime \
-$(LOCAL_PATH)/../../Classes \
-$(LOCAL_PATH)/../../../anysdk/lua-bindings/src
+$(LOCAL_PATH)/../../Classes
 
 LOCAL_STATIC_LIBRARIES := curl_static_prebuilt
 
 LOCAL_WHOLE_STATIC_LIBRARIES := cocos_lua_static
-LOCAL_WHOLE_STATIC_LIBRARIES += PluginProtocolStatic
 
 include $(BUILD_SHARED_LIBRARY)
 
 $(call import-module,scripting/lua-bindings/prebuilt-mk)
-$(call import-module,anysdk/android)
+
