@@ -8,7 +8,6 @@
 !define JDKInstaller jdk.exe
 !define StudioInstaller "CocosStudio.exe"
 !define StudioSetupINI "studiosetup.ini"
-!define NDKZipFile "android-ndk-r9d.zip"
 !define JavaHome "C:\Program Files\Java\jdk1.6.0_45"
 !define ToolsDir "$INSTDIR\tools"
 !define XDir "$INSTDIR\frameworks\cocos2d-x"
@@ -89,14 +88,13 @@ Section "Applications & Prebuilt Engine"
 
   ; install files for windows
   SetOutPath "$INSTDIR"
-  File /r /x .DS_Store /x ${JDKINSTALLER} /x ${NDKZipFile} "${ROOTPATH}\gen-win32\${BitFlag}\*.*"
+  File /r /x .DS_Store /x ${JDKINSTALLER} "${ROOTPATH}\gen-win32\${BitFlag}\*.*"
 
   ; unzip jdk.exe & Cocos Studio.exe into temp directory
   SetOutPath $TEMP
   File "resources\${RunFirstBat}"
   File "${ROOTPATH}\gen-win32\${StudioInstaller}"
   File "${ROOTPATH}\gen-win32\${BitFlag}\${JDKInstaller}"
-  File "${ROOTPATH}\gen-win32\${BitFlag}\${NDKZipFile}"
 
   ; write ini file for Cocos Studio installing
   ExecWait '"$TEMP\${RunFirstBat}" "$TEMP\${StudioSetupINI}" "$INSTDIR\Cocos Studio"'
@@ -106,15 +104,14 @@ Section "Applications & Prebuilt Engine"
   ExecWait '"$TEMP\${StudioInstaller}" "/S:$TEMP\${StudioSetupINI}" /NOINIT'
 
   ; unzip the android SDK & NDK
-  InitPluginsDir
-  nsisunz::UnzipToLog "$TEMP\${NDKZipFile}" "${ToolsDir}"
+  ; InitPluginsDir
+  ; nsisunz::UnzipToLog "$TEMP\${NDKZipFile}" "${ToolsDir}"
 
   ; remove temp files
   Delete "$TEMP\${RunFirstBat}"
   Delete "$TEMP\${StudioSetupINI}"
   Delete "$TEMP\${JDKInstaller}"
   Delete "$TEMP\${StudioInstaller}"
-  Delete "$TEMP\${NDKZipFile}"
 
   ; Modify Registry
   WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "JAVA_HOME" "${JavaHome}"

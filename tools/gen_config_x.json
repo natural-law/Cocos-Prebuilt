@@ -191,10 +191,6 @@
                 "lua-template-default/*",
                 ".gitignore"
             ]
-        },
-        {
-            "from": "anysdk",
-            "to": "gen/cocos/frameworks/anysdk"
         }
     ],
     "android_mks" : [
