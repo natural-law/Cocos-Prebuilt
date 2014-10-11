@@ -19,4 +19,4 @@ fi
 SETUP_PY="${INSATLL_DIR}/frameworks/cocos2d-x/setup.py"
 python "${SETUP_PY}" -a "" -n "" -t "${INSATLL_DIR}/tools/ant/bin"
 
-open "${INSATLL_DIR}/Cocos Studio.app"
+# open "${INSATLL_DIR}/Cocos Studio.app"
