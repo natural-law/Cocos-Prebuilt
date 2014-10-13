@@ -165,16 +165,6 @@
             ]
         },
         {
-            "from": "cocos2d-x/templates",
-            "to": "gen/cocos/frameworks/cocos2d-x/templates",
-            "exclude" : [
-                "lua-template-default/*",
-                "*wp8",
-                "*linux",
-                "*CMakeLists.txt"
-            ]
-        },
-        {
             "from": "cocos2d-x/tools/cocos2d-console",
             "to": "gen/cocos/frameworks/cocos2d-x/tools/cocos2d-console",
             "exclude": [
@@ -182,14 +172,6 @@
                 "download-bin.py",
                 "version.json",
                 "*.pyc"
-            ]
-        },
-        {
-            "from": "x-templates",
-            "to": "gen/cocos/frameworks/cocos2d-x/templates",
-            "exclude": [
-                "lua-template-default/*",
-                ".gitignore"
             ]
         }
     ],

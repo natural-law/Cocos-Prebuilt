@@ -55,20 +55,22 @@ class TemplateModifier(object):
 
         import modify_pbxproj
         pbx_proj = modify_pbxproj.XcodeProject.Load(proj_file_path)
-        xcode_proj_path = os.path.join(proj_file_path, os.path.pardir, os.path.pardir)
 
         if language == "cpp":
             targetName = "HelloCpp"
             template_engine_path = os.path.join(self.engine_path, "templates/cpp-template-default/cocos2d")
             link_libs = XCODE_LINK_CPP_LIBS
+            xcode_proj_path = os.path.join(self.engine_path, "templates/cpp-template-default/proj.ios_mac")
         elif language == "lua":
             targetName = "HelloLua"
             template_engine_path = os.path.join(self.engine_path, "templates/lua-template-runtime/frameworks/cocos2d-x")
             link_libs = XCODE_LINK_CPP_LIBS + XCODE_LINK_LUA_LIBS
+            xcode_proj_path = os.path.join(self.engine_path, "templates/lua-template-runtime/frameworks/runtime-src/proj.ios_mac")
         else:
             targetName = "HelloJavascript"
             template_engine_path = os.path.join(self.engine_path, "templates/js-template-runtime/frameworks/js-bindings")
             link_libs = XCODE_LINK_CPP_LIBS + XCODE_LINK_JS_LIBS
+            xcode_proj_path = os.path.join(self.engine_path, "templates/js-template-runtime/frameworks/runtime-src/proj.ios_mac")
         ios_target_name = "%s iOS" % targetName
         mac_target_name = "%s Mac" % targetName
 

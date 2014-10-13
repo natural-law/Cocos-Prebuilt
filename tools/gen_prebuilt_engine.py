@@ -246,13 +246,6 @@ class Generator(object):
         build_cmd = "%s compile -s %s -p android --ndk-mode release -j 4" % (cmd_path, proj_path)
         run_shell(build_cmd)
 
-        # copy .so to the template dir
-        libs_dir = os.path.join(proj_path, SCRIPT_ANDROID_SO_PATH)
-        target_libs_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "templates", "%s-template-runtime" % language, SCRIPT_ANDROID_SO_PATH)
-        if os.path.exists(target_libs_dir):
-            shutil.rmtree(target_libs_dir)
-        shutil.copytree(libs_dir, target_libs_dir)
-
         # copy .a to prebuilt dir
         obj_dir = os.path.join(proj_path, ANDROID_A_PATH)
         copy_cfg = {
@@ -308,10 +301,14 @@ class Generator(object):
         # copy to tmp dir
         import tempfile
         tmp_dir = os.path.join(tempfile.gettempdir(), "frameworks")
+        tmp_template_dir = os.path.join(tempfile.gettempdir(), "templates")
         tmp_engine_dir = os.path.join(tmp_dir, engine_name)
         if os.path.exists(tmp_dir):
             shutil.rmtree(tmp_dir)
+        if os.path.exists(tmp_template_dir):
+            shutil.rmtree(tmp_template_dir)
         shutil.copytree(os.path.join(self.root_dir, "gen", "cocos", "frameworks"), tmp_dir)
+        shutil.copytree(os.path.join(self.root_dir, "gen", "cocos", "templates"), tmp_template_dir)
 
         print("temp dir is %s" % tmp_dir)
 
@@ -333,9 +330,13 @@ class Generator(object):
         build_cmd = "%s compile -s %s -p android --ndk-mode release" % (cmd_path, proj_path)
         run_shell(build_cmd)
 
+        # get the templates dir
+        templates_dir_name = self.get_template_dirname(os.path.join(self.root_dir, "gen/cocos/frameworks", engine_name))
+        target_templates_dir = os.path.join(self.root_dir, "gen/cocos/templates", templates_dir_name)
+
         # copy .so to the template dir
         libs_dir = os.path.join(proj_path, so_path)
-        target_libs_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "templates", "%s-template-%s" % (language, template_name), so_path)
+        target_libs_dir = os.path.join(target_templates_dir, "%s-template-%s" % (language, template_name), so_path)
         if os.path.exists(target_libs_dir):
             shutil.rmtree(target_libs_dir)
         shutil.copytree(libs_dir, target_libs_dir)
@@ -346,7 +347,7 @@ class Generator(object):
 
         # copy the apk into template dir
         apk_dir = os.path.join(proj_path, "runtime", "android", "%s-debug.apk" % proj_name)
-        target_apk_path = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "templates", "%s-template-runtime" % language, "runtime", "android", "%s.apk" % proj_name)
+        target_apk_path = os.path.join(target_templates_dir, "%s-template-runtime" % language, "runtime", "android", "%s.apk" % proj_name)
         if os.path.exists(target_apk_path):
             os.remove(target_apk_path)
         shutil.copy(apk_dir, os.path.dirname(target_apk_path))
@@ -354,6 +355,7 @@ class Generator(object):
 
         # remove the temp dir
         shutil.rmtree(tmp_dir)
+        shutil.rmtree(tmp_template_dir)
 
     def get_required_vs_version(self, proj_file):
         # get the VS version required by the project
@@ -509,22 +511,6 @@ class Generator(object):
 
         print("Win32 build succeeded.")
 
-         # modify the VS project file of templates
-        import modify_template
-        if self.gen_x:
-            x_path = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-x")
-            modifier = modify_template.TemplateModifier(x_path)
-            cpp_proj_path = os.path.join(x_path, "templates/cpp-template-default/proj.win32/HelloCpp.vcxproj")
-            lua_proj_path = os.path.join(x_path, "templates/lua-template-runtime/frameworks/runtime-src/proj.win32/HelloLua.vcxproj")
-            modifier.modify_vs_proj(cpp_proj_path, "cpp")
-            modifier.modify_vs_proj(lua_proj_path, "lua")
-
-        if self.gen_js:
-            js_path = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-js")
-            modifier = modify_template.TemplateModifier(js_path)
-            js_proj_path = os.path.join(js_path, "templates/js-template-runtime/frameworks/runtime-src/proj.win32/HelloJavascript.vcxproj")
-            modifier.modify_vs_proj(js_proj_path, "js")
-
     def build_ios_mac(self):
         for key in self.xcode_proj_info.keys():
             output_dir = self.xcode_proj_info[key][Generator.KEY_OUTPUT_DIR]
@@ -564,22 +550,6 @@ class Generator(object):
                 mac_strip_cmd = "xcrun strip -S %s/*.a" % mac_out_dir
                 run_shell(mac_strip_cmd)
 
-        # modify the xcode project file of templates
-        import modify_template
-        if self.gen_x:
-            x_path = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-x")
-            modifier = modify_template.TemplateModifier(x_path)
-            cpp_proj_path = os.path.join(x_path, "templates/cpp-template-default/proj.ios_mac/HelloCpp.xcodeproj/project.pbxproj")
-            lua_proj_path = os.path.join(x_path, "templates/lua-template-runtime/frameworks/runtime-src/proj.ios_mac/HelloLua.xcodeproj/project.pbxproj")
-            modifier.modify_xcode_proj(cpp_proj_path, "cpp")
-            modifier.modify_xcode_proj(lua_proj_path, "lua")
-
-        if self.gen_js:
-            js_path = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-js")
-            modifier = modify_template.TemplateModifier(js_path)
-            js_proj_path = os.path.join(js_path, "templates/js-template-runtime/frameworks/runtime-src/proj.ios_mac/HelloJavascript.xcodeproj/project.pbxproj")
-            modifier.modify_xcode_proj(js_proj_path, "js")
-
     def build_all_libs(self):
         if os_is_mac():
             # build for iOS & Mac
@@ -616,6 +586,10 @@ class Generator(object):
             if os.path.exists(src_dir):
                 shutil.rmtree(src_dir)
 
+        template_dir = os.path.join(self.root_dir, "gen", "cocos", "templates")
+        if os.path.exists(template_dir):
+            shutil.rmtree(template_dir)
+
     def write_version(self, engine_name):
         src_engine_path = os.path.join(self.root_dir, engine_name)
         if engine_name == "cocos2d-x":
@@ -648,6 +622,116 @@ class Generator(object):
             f.write(ver)
             f.close()
 
+    def get_template_dirname(self, engine_path):
+        version_file = os.path.join(engine_path, "version")
+        f = open(version_file)
+        ver = f.read()
+        f.close()
+        ver = ver.replace(" ", "-")
+
+        return ver
+
+    def gen_templates(self, engine_name):
+        # copy templates from engine
+        if engine_name == "cocos2d-x":
+            exclude_rules =  [
+                "lua-template-default/*",
+                "*wp8",
+                "*linux",
+                "*CMakeLists.txt",
+                "cocos2dx_files.json"
+            ]
+            template_dir_name = "x-templates"
+        else:
+            exclude_rules =  [
+                "js-template-default/*"
+            ]
+            template_dir_name = "js-templates"
+
+        # get source directory
+        src_dir = os.path.join(engine_name, "templates")
+
+        # get engine version
+        ver = self.get_template_dirname(os.path.join(self.root_dir, "gen/cocos/frameworks", engine_name))
+
+        # get dst dir
+        dst_dir = os.path.join("gen/cocos/templates", ver)
+
+        # generate copy config
+        cfg = {
+            "from": src_dir,
+            "to": dst_dir,
+            "exclude": exclude_rules
+        }
+        excopy.copy_files_with_config(cfg, self.root_dir, self.root_dir)
+
+        # copy modified templates
+        cfg = {
+            "from": template_dir_name,
+            "to": dst_dir,
+            "exclude": exclude_rules
+        }
+        excopy.copy_files_with_config(cfg, self.root_dir, self.root_dir)
+
+        # copy cocos2dx_files.json
+        if engine_name == "cocos2d-x":
+            cfg = {
+                "from": template_dir_name,
+                "to": os.path.join("gen/cocos/frameworks", engine_name, "templates"),
+                "include": [
+                    "cocos2dx_files.json"
+                ]
+            }
+            excopy.copy_files_with_config(cfg, self.root_dir, self.root_dir)
+
+        # generate the env.json for new projects
+        env_path = os.path.join(self.root_dir, "gen/cocos/frameworks", engine_name, "tools/cocos2d-console/plugins/project_new/env.json")
+        template_root_cfg = "COCOS_ROOT/../../templates/%s" % ver
+        env_cfg = {
+            "COCOS_ROOT": "../../../..",
+            "templates_root": template_root_cfg
+        }
+        if engine_name == "cocos2d-x":
+            env_data = {
+                "lua" : env_cfg,
+                "cpp" : env_cfg
+            }
+        else:
+            env_data = {
+                "js" : env_cfg
+            }
+
+        f = open(env_path, 'w')
+        json.dump(env_data, f, sort_keys = True, indent = 4)
+        f.close()
+
+        import modify_template
+        if engine_name == "cocos2d-x":
+            # modify the VS project file of templates
+            x_path = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-x")
+            modifier = modify_template.TemplateModifier(x_path)
+            cpp_proj_path = os.path.join(self.root_dir, dst_dir, "cpp-template-default/proj.win32/HelloCpp.vcxproj")
+            lua_proj_path = os.path.join(self.root_dir, dst_dir, "lua-template-runtime/frameworks/runtime-src/proj.win32/HelloLua.vcxproj")
+            modifier.modify_vs_proj(cpp_proj_path, "cpp")
+            modifier.modify_vs_proj(lua_proj_path, "lua")
+
+            # modify the xcode project file of templates
+            cpp_proj_path = os.path.join(self.root_dir, dst_dir, "cpp-template-default/proj.ios_mac/HelloCpp.xcodeproj/project.pbxproj")
+            lua_proj_path = os.path.join(self.root_dir, dst_dir, "lua-template-runtime/frameworks/runtime-src/proj.ios_mac/HelloLua.xcodeproj/project.pbxproj")
+            modifier.modify_xcode_proj(cpp_proj_path, "cpp")
+            modifier.modify_xcode_proj(lua_proj_path, "lua")
+
+        if engine_name == "cocos2d-js":
+            # modify the VS project file of templates
+            js_path = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-js")
+            modifier = modify_template.TemplateModifier(js_path)
+            js_proj_path = os.path.join(self.root_dir, dst_dir, "js-template-runtime/frameworks/runtime-src/proj.win32/HelloJavascript.vcxproj")
+            modifier.modify_vs_proj(js_proj_path, "js")
+
+            # modify the xcode project file of templates
+            js_proj_path = os.path.join(self.root_dir, dst_dir, "js-template-runtime/frameworks/runtime-src/proj.ios_mac/HelloJavascript.xcodeproj/project.pbxproj")
+            modifier.modify_xcode_proj(js_proj_path, "js")
+
     def do_generate(self):
         if self.need_clean:
             # clean the files generated before
@@ -666,6 +750,9 @@ class Generator(object):
                 self.write_version("cocos2d-x")
                 self.gen_prebuilt_mk("lua")
 
+                # generate templates
+                self.gen_templates("cocos2d-x")
+
             if self.gen_js:
                 # create win32 directory in -js engine
                 js_win32_dir = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-js/frameworks/js-bindings/prebuilt/win32")
@@ -675,6 +762,9 @@ class Generator(object):
                 # write the version info of engine
                 self.write_version("cocos2d-js")
                 self.gen_prebuilt_mk("js")
+
+                # generate templates
+                self.gen_templates("cocos2d-js")
 
         self.build_all_libs()
 
