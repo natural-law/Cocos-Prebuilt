@@ -97,10 +97,17 @@ class TemplateModifier(object):
             mac_lib_path = os.path.join(os.path.relpath(mac_template_prebuilt_path, xcode_proj_path), mac_lib_name)
             pbx_proj.add_file_if_doesnt_exist(mac_lib_path, mac_lib_group, tree="<group>", target=mac_target_name)
 
-        # add main.json to the xcode project of cpp template
+        # add studio resources to the xcode project of cpp template
         if language == "cpp":
+            pbx_proj.remove_file_by_path("CloseNormal.png")
+            pbx_proj.remove_file_by_path("CloseSelected.png")
+            pbx_proj.remove_file_by_path("HelloWorld.png")
+
             res_group = pbx_proj.get_or_create_group("Resources")
-            pbx_proj.add_file_if_doesnt_exist("main.json", res_group, tree="<group>")
+            pbx_proj.add_file_if_doesnt_exist("MainScene.csb", res_group, tree="<group>")
+            pbx_proj.add_file_if_doesnt_exist("iphone/CloseNormal.png", res_group, tree="<group>")
+            pbx_proj.add_file_if_doesnt_exist("iphone/CloseSelected.png", res_group, tree="<group>")
+            pbx_proj.add_file_if_doesnt_exist("iphone/HelloWorld.png", res_group, tree="<group>")
 
         if pbx_proj.modified:
             pbx_proj.save()

@@ -641,10 +641,17 @@ class Generator(object):
                 "*CMakeLists.txt",
                 "cocos2dx_files.json"
             ]
+            temp_exclude = [
+                "lua-template-runtime/res/*",
+                "cpp-template-default/Resources/*"
+            ]
             template_dir_name = "x-templates"
         else:
             exclude_rules =  [
                 "js-template-default/*"
+            ]
+            temp_exclude = [
+                "js-template-runtime/res/*"
             ]
             template_dir_name = "js-templates"
 
@@ -661,7 +668,7 @@ class Generator(object):
         cfg = {
             "from": src_dir,
             "to": dst_dir,
-            "exclude": exclude_rules
+            "exclude": exclude_rules + temp_exclude
         }
         excopy.copy_files_with_config(cfg, self.root_dir, self.root_dir)
 

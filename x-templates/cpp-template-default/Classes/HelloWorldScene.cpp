@@ -31,11 +31,11 @@ bool HelloWorld::init()
         return false;
     }
     
-    auto rootNode = NodeReader::getInstance()->createNode("main.json");
+    auto rootNode = NodeReader::getInstance()->createNode("MainScene.csb");
 
     addChild(rootNode);
 
-    auto closeItem = static_cast<ui::Button*>(rootNode->getChildByName("btnClose"));
+    auto closeItem = static_cast<ui::Button*>(rootNode->getChildByName("Button_1"));
     closeItem->addTouchEventListener(CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
 
     return true;

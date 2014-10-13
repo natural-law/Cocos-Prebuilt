@@ -8,7 +8,8 @@
         "project_rename": {
             "src_project_name": "HelloLua",
             "files": [
-                "studio/PROJECT_NAME.xml.ui"
+               "PROJECT_NAME.ccs",
+               "PROJECT_NAME.cfg"
             ]
         },
         "project_replace_project_name": {
@@ -16,7 +17,7 @@
             "files": [
                 "config.json",
                 ".project",
-                "studio/PROJECT_NAME.xml.ui"
+                "PROJECT_NAME.ccs"
             ]
         },
         "append_dir": [

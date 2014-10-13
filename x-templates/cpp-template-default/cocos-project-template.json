@@ -11,7 +11,9 @@
                "proj.win32/PROJECT_NAME.vcxproj.filters",
                "proj.win32/PROJECT_NAME.vcxproj.user",
                "proj.win32/PROJECT_NAME.sln",
-               "proj.ios_mac/PROJECT_NAME.xcodeproj"
+               "proj.ios_mac/PROJECT_NAME.xcodeproj",
+               "PROJECT_NAME.ccs",
+               "PROJECT_NAME.cfg"
             ]
          },
          "project_replace_project_name":{
@@ -21,6 +23,7 @@
                "proj.win32/PROJECT_NAME.vcxproj.filters",
                "proj.win32/PROJECT_NAME.vcxproj.user",
                "proj.win32/PROJECT_NAME.sln",
+               "PROJECT_NAME.ccs",
                "proj.win32/main.cpp",
                "proj.android/.project",
                "proj.android/.cproject",
