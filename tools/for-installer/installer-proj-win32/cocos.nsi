@@ -17,6 +17,8 @@
 
 !include "StrFunc.nsh"
 !include "MUI.nsh"
+!include nsDialogs.nsh
+!include "resources\SamplesDir.nsdinc"
 
 ; Declare used functions
 ${StrLoc}
@@ -46,6 +48,7 @@ UninstallIcon resources\icon.ico
   !insertmacro MUI_PAGE_LICENSE "..\resources-common\license.txt"
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
+  Page Custom fnc_SamplesDir_Show fnc_SamplesDir_Leave
   !insertmacro MUI_PAGE_INSTFILES
  
     # These indented statements modify settings for MUI_PAGE_FINISH
@@ -78,6 +81,7 @@ Function AddPath
   ${EndIf}
 FunctionEnd
 
+Var samplesDir
 
 ;--------------------------------
 ; The stuff to install
@@ -109,7 +113,7 @@ Section "Applications & Framework"
 
   ; install jdk & Cocos Studio
   ExecWait '"$TEMP\${JDKInstaller}" /s'
-  ExecWait '"$TEMP\${StudioInstaller}" "/S:$TEMP\${StudioSetupINI}" /NOINIT'
+  ExecWait '"$TEMP\${StudioInstaller}" "/S:$TEMP\${StudioSetupINI}" /Doc "$samplesDir" /NOINIT'
 
   ; unzip the android SDK & NDK
   ; InitPluginsDir
@@ -169,5 +173,10 @@ SectionEnd
 
 Function LaunchLink
   ExecShell "" "${StudioDir}\CocosStudio.Launcher.exe"
+FunctionEnd
+
+Function fnc_SamplesDir_Leave
+  ${NSD_GetText} $hCtl_SamplesDir_DirRequest1_Txt $0
+  StrCpy $samplesDir $0
 FunctionEnd
 
