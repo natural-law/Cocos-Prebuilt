@@ -171,7 +171,8 @@
                 "config.json",
                 "download-bin.py",
                 "version.json",
-                "*.pyc"
+                "*.pyc",
+                ".gitignore"
             ]
         }
     ],

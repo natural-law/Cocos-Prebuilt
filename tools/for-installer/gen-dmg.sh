@@ -6,11 +6,13 @@ PROJ_NAME=$1
 WIN_WIDTH=770
 WIN_HEIGHT=410
 
+PKG_EXTENSION="mpkg"
+
 BASEDIR="$( cd "$( dirname "$0" )" && pwd )"
 RELEASE_DIR="${BASEDIR}/../../release"
-PKG_FILE_PATH="${RELEASE_DIR}/${PROJ_NAME}.pkg"
-SIGNED_PKG_NAME="${PROJ_NAME}_signed.pkg"
-UNSIGNED_PKG_NAME="${PROJ_NAME}_unsigned.pkg"
+PKG_FILE_PATH="${RELEASE_DIR}/${PROJ_NAME}.${PKG_EXTENSION}"
+SIGNED_PKG_NAME="${PROJ_NAME}_signed.${PKG_EXTENSION}"
+UNSIGNED_PKG_NAME="${PROJ_NAME}_unsigned.${PKG_EXTENSION}"
 
 #check if the app is exist
 if [ ! -d "${PKG_FILE_PATH}" ]; then
@@ -31,17 +33,17 @@ mkdir "${TMP_DIR}"
 cp -rf "${PKG_FILE_PATH}" "${TMP_DIR}"
 
 # remove the alias file in pkg
-NEED_REMOVE_FILE="${TMP_DIR}/${PROJ_NAME}.pkg/Contents/Resources/${PROJ_NAME}.pax.gz"
-if [ -f "${NEED_REMOVE_FILE}" ]; then
-    rm -rf "${NEED_REMOVE_FILE}"
-fi
+# NEED_REMOVE_FILE="${TMP_DIR}/${PROJ_NAME}.${PKG_EXTENSION}/Contents/Resources/${PROJ_NAME}.pax.gz"
+# if [ -f "${NEED_REMOVE_FILE}" ]; then
+#     rm -rf "${NEED_REMOVE_FILE}"
+# fi
 
 # sign the pkg
-productsign --sign "3rd Party Mac Developer Application: CocoaChina (U7E7529TA5)" "${TMP_DIR}/${PROJ_NAME}.pkg" "${TMP_DIR}/${SIGNED_PKG_NAME}"
+productsign --sign "3rd Party Mac Developer Application: CocoaChina (U7E7529TA5)" "${TMP_DIR}/${PROJ_NAME}.${PKG_EXTENSION}" "${TMP_DIR}/${SIGNED_PKG_NAME}"
 
 # rename the pkg files
-mv "${TMP_DIR}/${PROJ_NAME}.pkg" "${TMP_DIR}/${UNSIGNED_PKG_NAME}"
-mv "${TMP_DIR}/${SIGNED_PKG_NAME}" "${TMP_DIR}/${PROJ_NAME}.pkg"
+mv "${TMP_DIR}/${PROJ_NAME}.${PKG_EXTENSION}" "${TMP_DIR}/${UNSIGNED_PKG_NAME}"
+mv "${TMP_DIR}/${SIGNED_PKG_NAME}" "${TMP_DIR}/${PROJ_NAME}.${PKG_EXTENSION}"
 
 # create dmg file
 pushd "${TMP_DIR}"
@@ -52,8 +54,8 @@ pushd "${TMP_DIR}"
     --volname "${PROJ_NAME}" \
     --background "${RES_DIR}/dmg_background.jpg" \
     --icon-size 192 \
-    --icon "${PROJ_NAME}.pkg" 590 165 \
-    "${TARGET_NAME}" "${TMP_DIR}/${PROJ_NAME}.pkg"
+    --icon "${PROJ_NAME}.${PKG_EXTENSION}" 590 165 \
+    "${TARGET_NAME}" "${TMP_DIR}/${PROJ_NAME}.${PKG_EXTENSION}"
 
 popd
 

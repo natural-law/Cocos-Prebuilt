@@ -29,8 +29,10 @@ OutFile "${ROOTPATH}\release\${PRODUCTNAME}-${BitFlag}.exe"      ; The file to w
 ; The default installation directory
 !if ${BitFlag} == "64bit"
   InstallDir "$PROGRAMFILES64\${PRODUCTNAME}"
+  !define RegView 64
 !else
   InstallDir "$PROGRAMFILES32\${PRODUCTNAME}"
+  !define RegView 32
 !endif
 
 !define StudioDir "$INSTDIR\Cocos Studio"
@@ -134,6 +136,10 @@ Section "Applications & Framework"
   StrCpy $needAddPath "%JAVA_HOME%\bin"
   Call AddPath
 
+  ; Write install path into registry
+  SetRegView ${RegView}
+  WriteRegStr HKLM "Software\Cocos" "InstallDir" "$INSTDIR"
+
   ; invoke the setup.py
   ExecWait '"${ToolsDir}\Python27\python.exe" "${XDir}\setup.py" -a "" -n "${ToolsDir}\android-ndk-r9d" -t "${ToolsDir}\ant\bin"'
 
@@ -167,6 +173,10 @@ Section "Uninstall"
   ; Delete "$desktop\AnySDK.lnk"
   Delete "$desktop\Cocos Code IDE.lnk"
   Delete "$desktop\Cocos Launcher.lnk"
+
+  ; remove registry
+  SetRegView ${RegView}
+  DeleteRegKey HKLM "Software\Cocos"
 
   RMDir /r /REBOOTOK "$INSTDIR"
 SectionEnd
