@@ -22,7 +22,7 @@ end
 
 -- create layer
 function GameScene:createLayer()
-    local rootNode = ccs.NodeReader:getInstance():createNode("MainScene.csb")
+    local rootNode = cc.CSLoader:createNode("MainScene.csb")
 
     local menuPopup, menuTools, effectID
 

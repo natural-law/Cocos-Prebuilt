@@ -165,6 +165,10 @@ class Generator(object):
         if os.path.isfile(zip_path):
             os.remove(zip_path)
 
+        repo_path = os.path.join(self.root_dir, repo_name)
+        if os.path.exists(repo_path):
+            shutil.rmtree(repo_path)
+
         # run the tool
         print("> Generating the zip file")
         tool_dir_name = os.path.dirname(tool_path)
@@ -358,28 +362,8 @@ class Generator(object):
         shutil.rmtree(tmp_template_dir)
 
     def get_required_vs_version(self, proj_file):
-        # get the VS version required by the project
-        import re
-        file_obj = open(proj_file)
-        pattern = re.compile(r"^# Visual Studio.+(\d{4})")
-        num = None
-        for line in file_obj:
-            match = pattern.match(line)
-            if match is not None:
-                num = match.group(1)
-                break
-
-        if num is not None:
-            if num == "2012":
-                ret = "11.0"
-            elif num == "2013":
-                ret = "12.0"
-            else:
-                ret = None
-        else:
-            ret = None
-
-        return ret
+        # Now VS2012 is the mini version required
+        return "11.0"
 
     def get_vs_cmd_path(self, vs_reg, proj_path):
         # get required vs version
@@ -521,7 +505,7 @@ class Generator(object):
             ios_sim_libs_dir = os.path.join(ios_out_dir, "simulator")
             ios_dev_libs_dir = os.path.join(ios_out_dir, "device")
             for target in self.xcode_proj_info[key][Generator.KEY_TARGETS]:
-                build_cmd = Generator.XCODE_CMD_FMT % (proj_path, "%s iOS" % target, "-sdk iphonesimulator", ios_sim_libs_dir)
+                build_cmd = Generator.XCODE_CMD_FMT % (proj_path, "%s iOS" % target, "-sdk iphonesimulator VALID_ARCHS=\"i386 x86_64\"", ios_sim_libs_dir)
                 run_shell(build_cmd, self.tool_dir)
 
                 build_cmd = Generator.XCODE_CMD_FMT % (proj_path, "%s iOS" % target, "-sdk iphoneos", ios_dev_libs_dir)

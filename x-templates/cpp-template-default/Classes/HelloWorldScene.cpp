@@ -31,7 +31,7 @@ bool HelloWorld::init()
         return false;
     }
     
-    auto rootNode = NodeReader::getInstance()->createNode("MainScene.csb");
+    auto rootNode = CSLoader::createNode("MainScene.csb");
 
     addChild(rootNode);
 

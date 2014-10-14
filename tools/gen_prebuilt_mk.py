@@ -18,7 +18,7 @@ from argparse import ArgumentParser
 
 class MKGenerator(object):
 
-    SRC_FILE_CFG_PATTERN = r"^LOCAL_SRC_FILES[ \t]+\:=[ \t]+.+"
+    SRC_FILE_CFG_PATTERN = r"^LOCAL_SRC_FILES[ \t]+[\:\+]=[ \t]+.+"
     INCLUDE_CFG_PATTERN  = r"^include[ \t]+\$\(BUILD_STATIC_LIBRARY\)"
 
     LIB_MODULE_PATTERN = r"^LOCAL_MODULE[ \t]+\:=[ \t]+(.+)"
@@ -79,10 +79,13 @@ class MKGenerator(object):
         new_lines = []
 
         src_file_begin_flag = False
+        added = False
         for line in lines:
             trim_line = line.lstrip(" ")
             if re.match(MKGenerator.SRC_FILE_CFG_PATTERN, trim_line):
-                new_lines.append("LOCAL_SRC_FILES := %s\n" % new_src_file)
+                if not added:
+                    new_lines.append("LOCAL_SRC_FILES := %s\n" % new_src_file)
+                    added = True
                 if line.endswith("\\\n"):
                     src_file_begin_flag = True
             elif src_file_begin_flag:

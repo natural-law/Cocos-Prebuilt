@@ -19,13 +19,10 @@ IOS_PREBUILT_PATH = "prebuilt/ios"
 MAC_PREBUILT_PATH = "prebuilt/mac"
 
 WIN32_LINK_CPP_LIBS = [
-    "libAudio", "libBox2D", "libchipmunk",
-    "libcocos2d", "libCocosBuilder", "libCocosStudio",
-    "libExtensions", "libGUI", "libLocalStorage",
-    "libNetwork", "libSpine"
+    "libbox2d", "libcocos2d", "libSpine"
 ]
 
-WIN32_LINK_LUA_LIBS = [ "liblua" ]
+WIN32_LINK_LUA_LIBS = [ "libluacocos2d" ]
 
 WIN32_LINK_JS_LIBS = [
     "libJSBinding", "libJSBindingForBuilder", "libJSBindingForChipmunk",
@@ -34,11 +31,10 @@ WIN32_LINK_JS_LIBS = [
 ]
 
 XCODE_LINK_CPP_LIBS = [
-    "libCocosDenshion", "libchipmunk", "libcocos2dx-extensions",
-    "libbox2d", "libcocos2dx"
+    "libcocos2d"
 ]
 
-XCODE_LINK_LUA_LIBS = [ "libluabindings" ]
+XCODE_LINK_LUA_LIBS = [ "libluacocos2d" ]
 
 XCODE_LINK_JS_LIBS = [ "libjsbindings" ]
 
@@ -102,12 +98,11 @@ class TemplateModifier(object):
             pbx_proj.remove_file_by_path("CloseNormal.png")
             pbx_proj.remove_file_by_path("CloseSelected.png")
             pbx_proj.remove_file_by_path("HelloWorld.png")
+            pbx_proj.remove_file_by_path("Marker Felt.ttf")
 
             res_group = pbx_proj.get_or_create_group("Resources")
             pbx_proj.add_file_if_doesnt_exist("MainScene.csb", res_group, tree="<group>")
-            pbx_proj.add_file_if_doesnt_exist("iphone/CloseNormal.png", res_group, tree="<group>")
-            pbx_proj.add_file_if_doesnt_exist("iphone/CloseSelected.png", res_group, tree="<group>")
-            pbx_proj.add_file_if_doesnt_exist("iphone/HelloWorld.png", res_group, tree="<group>")
+            pbx_proj.add_file_if_doesnt_exist("iphone", res_group, tree="<group>")
 
         if pbx_proj.modified:
             pbx_proj.save()
