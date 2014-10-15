@@ -3,7 +3,7 @@
 
 ; define macros
 ;--------------------------------
-!define ROOTPATH ..\..\..
+!define ROOTPATH ..\..
 !define PRODUCTNAME Cocos
 !define JDKInstaller jdk.exe
 !define StudioInstaller "CocosStudio.exe"
@@ -28,10 +28,10 @@ OutFile "${ROOTPATH}\release\${PRODUCTNAME}-${BitFlag}.exe"      ; The file to w
 
 ; The default installation directory
 !if ${BitFlag} == "64bit"
-  InstallDir "$PROGRAMFILES64\${PRODUCTNAME}"
+  InstallDir "$PROGRAMFILES64\cocos"
   !define RegView 32
 !else
-  InstallDir "$PROGRAMFILES32\${PRODUCTNAME}"
+  InstallDir "$PROGRAMFILES32\cocos"
   !define RegView 32
 !endif
 

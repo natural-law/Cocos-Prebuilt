@@ -21,5 +21,5 @@ xcschememanagement.plist
 ._.*
 xcuserdata/
 DerivedData/
-tools/for-installer/installer-proj-mac/plugins/AndroidPaths/Build/*
-tools/for-installer/installer-proj-mac/plugins/LauncherConfirm/Build/*
+tools/installer-proj-mac/plugins/AndroidPaths/Build/*
+tools/installer-proj-mac/plugins/LauncherConfirm/Build/*
