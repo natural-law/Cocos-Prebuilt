@@ -213,7 +213,7 @@ class Generator(object):
     def modify_mk(self, mk_file):
         if os.path.isfile(mk_file):
             file_obj = open(mk_file, "a")
-            file_obj.write("\nAPP_ABI :=armeabi armeabi-v7a x86\n")
+            file_obj.write("\nAPP_ABI :=armeabi armeabi-v7a\n")
             file_obj.close()
 
     def is_32bit_windows(self):
@@ -282,7 +282,7 @@ class Generator(object):
 
             # strip x86 libs
             strip_cmd_path = os.path.join(ndk_root, "toolchains/x86-4.8/prebuilt/%s/i686-linux-android/bin/strip" % sys_folder_name)
-            if os.path.exists(strip_cmd_path):
+            if os.path.exists(strip_cmd_path) and os.path.exists(os.path.join(prebuilt_dir, "x86")):
                 strip_cmd = "%s -S %s/x86/*.a" % (strip_cmd_path, prebuilt_dir)
                 run_shell(strip_cmd)
 
@@ -546,10 +546,10 @@ class Generator(object):
         if not self.no_android:
             if self.gen_x:
                 self.build_android("lua")
-                self.build_so_for_anysdk("lua")
+                # self.build_so_for_anysdk("lua")
             if self.gen_js:
                 self.build_android("js")
-                self.build_so_for_anysdk("js")
+                # self.build_so_for_anysdk("js")
 
     def clean_gen(self):
         if self.gen_x:
