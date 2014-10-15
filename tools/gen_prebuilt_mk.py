@@ -208,6 +208,14 @@ class MKGenerator(object):
 
         return new_lines
 
+    def use_whole_lib(self, lines):
+        new_lines = []
+        for line in lines:
+            new_line = line.replace("LOCAL_STATIC_LIBRARIES", "LOCAL_WHOLE_STATIC_LIBRARIES")
+            new_lines.append(new_line)
+
+        return new_lines
+
     def do_generate(self):
         lib_file_name = self.get_lib_file_name()
         if lib_file_name is None:
@@ -245,6 +253,9 @@ class MKGenerator(object):
 
         # modify the import-module
         dst_lines = self.modify_import_module(dst_lines)
+
+        # use whole libs
+        dst_lines = self.use_whole_lib(dst_lines)
 
         dst_mk_obj.writelines(dst_lines)
 

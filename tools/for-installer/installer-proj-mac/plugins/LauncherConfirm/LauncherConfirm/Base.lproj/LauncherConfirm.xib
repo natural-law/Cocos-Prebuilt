@@ -25,7 +25,7 @@
                 <button id="zRK-pB-42Q">
                     <rect key="frame" x="129" y="156" width="161" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="Start Cocos Launcher" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="kgc-q8-ALt">
+                    <buttonCell key="cell" type="check" title="Launch Cocos" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="kgc-q8-ALt">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>

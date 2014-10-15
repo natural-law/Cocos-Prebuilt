@@ -5,12 +5,11 @@ INSATLL_DIR="/Applications/cocos"
 
 # install cocos studio
 MONO_PKG="${INSATLL_DIR}/Mono-MRE-For-CCS.pkg"
-STUDIO_PKG="${INSATLL_DIR}/Cocos Studio.pkg"
+STUDIO_PKG="${INSATLL_DIR}/CocosStudio.pkg"
 STUDIO_PATH="/Applications/Cocos Studio.app"
 if [ -f "${STUDIO_PKG}" ]; then
     sudo installer -pkg "${MONO_PKG}" -target /
     sudo installer -pkg "${STUDIO_PKG}" -target /
-    mv -f "${STUDIO_PATH}" "${INSATLL_DIR}/Cocos Studio.app"
     rm -rf "${STUDIO_PKG}"
     rm -rf "${MONO_PKG}"
 fi

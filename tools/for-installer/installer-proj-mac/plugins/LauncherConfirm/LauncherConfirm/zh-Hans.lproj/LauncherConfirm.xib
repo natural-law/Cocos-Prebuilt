@@ -24,7 +24,7 @@
             <subviews>
                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ult-Fd-aa9">
                     <rect key="frame" x="129" y="156" width="161" height="18"/>
-                    <buttonCell key="cell" type="check" title="启动 Cocos Launcher" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Z61-Lb-dbh">
+                    <buttonCell key="cell" type="check" title="启动 Cocos" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Z61-Lb-dbh">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" size="13" name="STHeitiSC-Light"/>
                     </buttonCell>
