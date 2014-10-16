@@ -56,7 +56,7 @@ UninstallIcon resources\icon.ico
     # These indented statements modify settings for MUI_PAGE_FINISH
     !define MUI_FINISHPAGE_NOAUTOCLOSE
     !define MUI_FINISHPAGE_RUN
-    !define MUI_FINISHPAGE_RUN_TEXT "Start Launcher"
+    !define MUI_FINISHPAGE_RUN_TEXT "Start ${PRODUCTNAME}"
     !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchLink"
   !insertmacro MUI_PAGE_FINISH
  
@@ -95,6 +95,10 @@ Section "Applications & Framework"
   ; install frameworks
   SetOutPath "$INSTDIR\frameworks"
   File /r /x .DS_Store "${ROOTPATH}\gen\cocos\frameworks\*.*"
+
+  ; install templates
+  SetOutPath "$INSTDIR\templates"
+  File /r /x .DS_Store "${ROOTPATH}\gen\cocos\templates\*.*"
 
   ; install ant
   SetOutPath "${ToolsDir}\ant"
@@ -144,7 +148,7 @@ Section "Applications & Framework"
   ExecWait '"${ToolsDir}\Python27\python.exe" "${XDir}\setup.py" -a "" -n "${ToolsDir}\android-ndk-r9d" -t "${ToolsDir}\ant\bin"'
 
   ; creat desktop icon
-  CreateShortCut "$desktop\Cocos Launcher.lnk" "${StudioDir}\CocosStudio.Launcher.exe"
+  ; CreateShortCut "$desktop\${PRODUCTNAME}.lnk" "${StudioDir}\CocosStudio.Launcher.exe"
   ; CreateShortCut "$desktop\AnySDK.lnk" "$INSTDIR\AnySDK\bin\AnySDK.exe"
   CreateShortCut "$desktop\Cocos Code IDE.lnk" "$INSTDIR\IDE\Cocos Code IDE.exe"
 
@@ -172,7 +176,7 @@ Section "Uninstall"
   ; delete desktop icon
   ; Delete "$desktop\AnySDK.lnk"
   Delete "$desktop\Cocos Code IDE.lnk"
-  Delete "$desktop\Cocos Launcher.lnk"
+  ; Delete "$desktop\${PRODUCTNAME}.lnk"
 
   ; remove registry
   SetRegView ${RegView}
