@@ -26,14 +26,17 @@ ${StrLoc}
 Name "${PRODUCTNAME}"                                            ; The name of the installer
 OutFile "${ROOTPATH}\release\${PRODUCTNAME}-${BitFlag}.exe"      ; The file to write
 
+BrandingText "Cocos Installer"
+
 ; The default installation directory
-!if ${BitFlag} == "64bit"
-  InstallDir "$PROGRAMFILES64\cocos"
-  !define RegView 32
-!else
-  InstallDir "$PROGRAMFILES32\cocos"
-  !define RegView 32
-!endif
+; !if ${BitFlag} == "64bit"
+;   InstallDir "$PROGRAMFILES64\cocos"
+; !else
+;   InstallDir "$PROGRAMFILES32\cocos"
+; !endif
+
+InstallDir "C:\Cocos"
+!define RegView 32
 
 !define StudioDir "$INSTDIR\Cocos Studio"
 
@@ -49,6 +52,8 @@ UninstallIcon resources\icon.ico
 
   !insertmacro MUI_PAGE_LICENSE "..\resources-common\license.txt"
   !insertmacro MUI_PAGE_COMPONENTS
+
+  !define MUI_PAGE_CUSTOMFUNCTION_LEAVE dir_leave
   !insertmacro MUI_PAGE_DIRECTORY
   Page Custom fnc_SamplesDir_Show fnc_SamplesDir_Leave
   !insertmacro MUI_PAGE_INSTFILES
@@ -88,7 +93,9 @@ Var samplesDir
 ;--------------------------------
 ; The stuff to install
 ; Section 1
-Section "Applications & Framework"
+SectionGroup "Frameworks" SectionFramework
+
+Section "Prebuilt libs" SectionPrebuilt
 
   SectionIn RO
 
@@ -99,6 +106,23 @@ Section "Applications & Framework"
   ; install templates
   SetOutPath "$INSTDIR\templates"
   File /r /x .DS_Store "${ROOTPATH}\gen\cocos\templates\*.*"
+
+SectionEnd
+
+Section /o "Source Code" SectionSource
+
+  ; Set output path to the installation directory.
+  SetOutPath $INSTDIR
+  
+  ; Put file there
+  File /r /x .DS_Store "${ROOTPATH}\gen-src\cocos\*.*"
+  
+SectionEnd
+
+SectionGroupEnd
+
+; Section 2
+Section "Tools" SectionTools
 
   ; install ant
   SetOutPath "${ToolsDir}\ant"
@@ -155,17 +179,6 @@ Section "Applications & Framework"
   WriteUninstaller $INSTDIR\uninstaller.exe
 SectionEnd
 
-; Section 2
-Section /o "Source Code"
-
-  ; Set output path to the installation directory.
-  SetOutPath $INSTDIR
-  
-  ; Put file there
-  File /r /x .DS_Store "${ROOTPATH}\gen-src\cocos\*.*"
-  
-SectionEnd
-
 Section "Uninstall"
   ; uninstall Cocos Studio
   ExecWait '"$INSTDIR\Cocos Studio\InstallData\uninstall.exe" "/U:$INSTDIR\Cocos Studio\InstallData\uninstall.xml" /S"'
@@ -184,6 +197,28 @@ Section "Uninstall"
 
   RMDir /r /REBOOTOK "$INSTDIR"
 SectionEnd
+
+LangString DESC_Tools ${LANG_ENGLISH} "The tools include Cocos Studio, Cocos Code IDE."
+LangString DESC_Framework ${LANG_ENGLISH} "The cocos2d-x frameworks."
+LangString DESC_Prebuilt ${LANG_ENGLISH} "The prebuilt libs for cocos2d-x."
+LangString DESC_Source ${LANG_ENGLISH} "The source code of cocos2d-x."
+
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+  !insertmacro MUI_DESCRIPTION_TEXT ${SectionFramework} $(DESC_Framework)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SectionTools} $(DESC_Tools)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SectionPrebuilt} $(DESC_Prebuilt)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SectionSource} $(DESC_Source)
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+Function dir_leave
+
+  Var /GLOBAL spacePos
+  ${StrLoc} $spacePos "$INSTDIR" " " >
+  ${If} $spacePos != ""
+    MessageBox MB_ICONSTOP|MB_OK '$INSTDIR should not contains space.'
+    Abort
+  ${EndIf}
+Functionend
 
 Function LaunchLink
   ExecShell "" "${StudioDir}\CocosStudio.Launcher.exe"
