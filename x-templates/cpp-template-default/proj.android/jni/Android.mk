@@ -18,6 +18,8 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes
 
 LOCAL_STATIC_LIBRARIES := cocos2dx_static
 
+LOCAL_LDLIBS += -L$(call host-path,$(NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/$(TARGET_ARCH_ABI)) -lc++_static
+
 include $(BUILD_SHARED_LIBRARY)
 
 $(call import-module,./prebuilt-mk)

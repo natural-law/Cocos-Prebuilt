@@ -213,7 +213,7 @@ class Generator(object):
     def modify_mk(self, mk_file):
         if os.path.isfile(mk_file):
             file_obj = open(mk_file, "a")
-            file_obj.write("\nAPP_ABI :=armeabi armeabi-v7a\n")
+            file_obj.write("\nAPP_ABI :=armeabi armeabi-v7a x86\n")
             file_obj.close()
 
     def is_32bit_windows(self):
