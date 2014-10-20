@@ -193,11 +193,11 @@ class Generator(object):
     def gen_prebuilt_mk(self, language):
         if language == "js":
             engine_name = "cocos2d-js"
-            prebuilt_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "frameworks", "js-bindings", "cocos2d-x", "prebuilt", "android")
+            prebuilt_dir = os.path.join(self.root_dir, "gen", "Cocos", "frameworks", engine_name, "frameworks", "js-bindings", "cocos2d-x", "prebuilt", "android")
             android_mks = self.js_android_mks
         else:
             engine_name = "cocos2d-x"
-            prebuilt_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "prebuilt", "android")
+            prebuilt_dir = os.path.join(self.root_dir, "gen", "Cocos", "frameworks", engine_name, "prebuilt", "android")
             android_mks = self.x_android_mks
 
         # modify the mk files to prebuilt version
@@ -225,10 +225,10 @@ class Generator(object):
         # build .so for android
         if language == "js":
             engine_name = "cocos2d-js"
-            prebuilt_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "frameworks", "js-bindings", "cocos2d-x", "prebuilt", "android")
+            prebuilt_dir = os.path.join(self.root_dir, "gen", "Cocos", "frameworks", engine_name, "frameworks", "js-bindings", "cocos2d-x", "prebuilt", "android")
         else:
             engine_name = "cocos2d-x"
-            prebuilt_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", engine_name, "prebuilt", "android")
+            prebuilt_dir = os.path.join(self.root_dir, "gen", "Cocos", "frameworks", engine_name, "prebuilt", "android")
 
         engine_dir = os.path.join(self.root_dir, engine_name)
         console_dir = os.path.join(engine_dir, CONSOLE_PATH)
@@ -311,8 +311,8 @@ class Generator(object):
             shutil.rmtree(tmp_dir)
         if os.path.exists(tmp_template_dir):
             shutil.rmtree(tmp_template_dir)
-        shutil.copytree(os.path.join(self.root_dir, "gen", "cocos", "frameworks"), tmp_dir)
-        shutil.copytree(os.path.join(self.root_dir, "gen", "cocos", "templates"), tmp_template_dir)
+        shutil.copytree(os.path.join(self.root_dir, "gen", "Cocos", "frameworks"), tmp_dir)
+        shutil.copytree(os.path.join(self.root_dir, "gen", "Cocos", "templates"), tmp_template_dir)
 
         print("temp dir is %s" % tmp_dir)
 
@@ -335,8 +335,8 @@ class Generator(object):
         run_shell(build_cmd)
 
         # get the templates dir
-        templates_dir_name = self.get_template_dirname(os.path.join(self.root_dir, "gen/cocos/frameworks", engine_name))
-        target_templates_dir = os.path.join(self.root_dir, "gen/cocos/templates", templates_dir_name)
+        templates_dir_name = self.get_template_dirname(os.path.join(self.root_dir, "gen/Cocos/frameworks", engine_name))
+        target_templates_dir = os.path.join(self.root_dir, "gen/Cocos/templates", templates_dir_name)
 
         # copy .so to the template dir
         libs_dir = os.path.join(proj_path, so_path)
@@ -553,24 +553,24 @@ class Generator(object):
 
     def clean_gen(self):
         if self.gen_x:
-            gen_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", "cocos2d-x")
+            gen_dir = os.path.join(self.root_dir, "gen", "Cocos", "frameworks", "cocos2d-x")
             if os.path.exists(gen_dir):
                 shutil.rmtree(gen_dir)
 
-            src_dir = os.path.join(self.root_dir, "gen-src", "cocos", "frameworks", "cocos2d-x")
+            src_dir = os.path.join(self.root_dir, "gen-src", "Cocos", "frameworks", "cocos2d-x")
             if os.path.exists(src_dir):
                 shutil.rmtree(src_dir)
 
         if self.gen_js:
-            gen_dir = os.path.join(self.root_dir, "gen", "cocos", "frameworks", "cocos2d-js")
+            gen_dir = os.path.join(self.root_dir, "gen", "Cocos", "frameworks", "cocos2d-js")
             if os.path.exists(gen_dir):
                 shutil.rmtree(gen_dir)
 
-            src_dir = os.path.join(self.root_dir, "gen-src", "cocos", "frameworks", "cocos2d-js")
+            src_dir = os.path.join(self.root_dir, "gen-src", "Cocos", "frameworks", "cocos2d-js")
             if os.path.exists(src_dir):
                 shutil.rmtree(src_dir)
 
-        template_dir = os.path.join(self.root_dir, "gen", "cocos", "templates")
+        template_dir = os.path.join(self.root_dir, "gen", "Cocos", "templates")
         if os.path.exists(template_dir):
             shutil.rmtree(template_dir)
 
@@ -597,7 +597,7 @@ class Generator(object):
         if len(ver) <= 0:
             raise Exception("Can't find version in %s" % file_path)
         else:
-            engine_path = os.path.join(self.root_dir, "gen/cocos/frameworks", engine_name)
+            engine_path = os.path.join(self.root_dir, "gen/Cocos/frameworks", engine_name)
             dst_file = os.path.join(engine_path, "version")
             dst_dir = os.path.dirname(dst_file)
             if not os.path.exists(dst_dir):
@@ -643,10 +643,10 @@ class Generator(object):
         src_dir = os.path.join(engine_name, "templates")
 
         # get engine version
-        ver = self.get_template_dirname(os.path.join(self.root_dir, "gen/cocos/frameworks", engine_name))
+        ver = self.get_template_dirname(os.path.join(self.root_dir, "gen/Cocos/frameworks", engine_name))
 
         # get dst dir
-        dst_dir = os.path.join("gen/cocos/templates", ver)
+        dst_dir = os.path.join("gen/Cocos/templates", ver)
 
         # generate copy config
         cfg = {
@@ -668,7 +668,7 @@ class Generator(object):
         if engine_name == "cocos2d-x":
             cfg = {
                 "from": template_dir_name,
-                "to": os.path.join("gen/cocos/frameworks", engine_name, "templates"),
+                "to": os.path.join("gen/Cocos/frameworks", engine_name, "templates"),
                 "include": [
                     "cocos2dx_files.json"
                 ]
@@ -676,7 +676,7 @@ class Generator(object):
             excopy.copy_files_with_config(cfg, self.root_dir, self.root_dir)
 
         # generate the env.json for new projects
-        env_path = os.path.join(self.root_dir, "gen/cocos/frameworks", engine_name, "tools/cocos2d-console/plugins/project_new/env.json")
+        env_path = os.path.join(self.root_dir, "gen/Cocos/frameworks", engine_name, "tools/cocos2d-console/plugins/project_new/env.json")
         template_root_cfg = "COCOS_ROOT/../../templates/%s" % ver
         env_cfg = {
             "COCOS_ROOT": "../../../..",
@@ -699,7 +699,7 @@ class Generator(object):
         import modify_template
         if engine_name == "cocos2d-x":
             # modify the VS project file of templates
-            x_path = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-x")
+            x_path = os.path.join(self.root_dir, "gen/Cocos/frameworks/cocos2d-x")
             modifier = modify_template.TemplateModifier(x_path)
             cpp_proj_path = os.path.join(self.root_dir, dst_dir, "cpp-template-default/proj.win32/HelloCpp.vcxproj")
             lua_proj_path = os.path.join(self.root_dir, dst_dir, "lua-template-runtime/frameworks/runtime-src/proj.win32/HelloLua.vcxproj")
@@ -714,7 +714,7 @@ class Generator(object):
 
         if engine_name == "cocos2d-js":
             # modify the VS project file of templates
-            js_path = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-js")
+            js_path = os.path.join(self.root_dir, "gen/Cocos/frameworks/cocos2d-js")
             modifier = modify_template.TemplateModifier(js_path)
             js_proj_path = os.path.join(self.root_dir, dst_dir, "js-template-runtime/frameworks/runtime-src/proj.win32/HelloJavascript.vcxproj")
             modifier.modify_vs_proj(js_proj_path, "js")
@@ -733,7 +733,7 @@ class Generator(object):
 
             if self.gen_x:
                 # create win32 directory in -x engine
-                x_win32_dir = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-x/prebuilt/win32")
+                x_win32_dir = os.path.join(self.root_dir, "gen/Cocos/frameworks/cocos2d-x/prebuilt/win32")
                 if not os.path.exists(x_win32_dir):
                     os.makedirs(x_win32_dir)
 
@@ -746,7 +746,7 @@ class Generator(object):
 
             if self.gen_js:
                 # create win32 directory in -js engine
-                js_win32_dir = os.path.join(self.root_dir, "gen/cocos/frameworks/cocos2d-js/frameworks/js-bindings/prebuilt/win32")
+                js_win32_dir = os.path.join(self.root_dir, "gen/Cocos/frameworks/cocos2d-js/frameworks/js-bindings/prebuilt/win32")
                 if not os.path.exists(js_win32_dir):
                     os.makedirs(js_win32_dir)
 
@@ -761,7 +761,7 @@ class Generator(object):
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Generate prebuilt engine for Cocos Engine.")
-    parser.add_argument('-c', dest='need_clean', action="store_true", help='Remove the \"gen/cocos/frameworks\" directory first, and copy files again.')
+    parser.add_argument('-c', dest='need_clean', action="store_true", help='Remove the \"gen/Cocos/frameworks\" directory first, and copy files again.')
     parser.add_argument('-n', "--no-android", dest='no_android', action="store_true", help='Not build android so.')
     parser.add_argument('-i', "--incredibuild", dest='use_incredibuild', action="store_true", help='Use incredibuild to build win32 projects. Only available on windows.')
     parser.add_argument('-x', "--cocos2dx", dest='x_repo_path', help='Set the repo path of cocos2d-x.')

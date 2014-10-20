@@ -99,6 +99,8 @@ class TemplateModifier(object):
             pbx_proj.remove_file_by_path("CloseSelected.png")
             pbx_proj.remove_file_by_path("HelloWorld.png")
             pbx_proj.remove_file_by_path("Marker Felt.ttf")
+            pbx_proj.remove_file_by_path("fonts")
+            pbx_proj.remove_file_by_path("res")
 
             res_group = pbx_proj.get_or_create_group("Resources")
             pbx_proj.add_file_if_doesnt_exist("MainScene.csb", res_group, tree="<group>")

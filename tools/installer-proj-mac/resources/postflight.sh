@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # change the premission of cocos folder
-INSATLL_DIR="/Applications/cocos"
+INSATLL_DIR="/Applications/Cocos"
 
 # install cocos studio
 MONO_PKG="${INSATLL_DIR}/Mono-MRE-For-CCS.pkg"

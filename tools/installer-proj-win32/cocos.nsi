@@ -30,9 +30,9 @@ BrandingText "Cocos Installer"
 
 ; The default installation directory
 ; !if ${BitFlag} == "64bit"
-;   InstallDir "$PROGRAMFILES64\cocos"
+;   InstallDir "$PROGRAMFILES64\${PRODUCTNAME}"
 ; !else
-;   InstallDir "$PROGRAMFILES32\cocos"
+;   InstallDir "$PROGRAMFILES32\${PRODUCTNAME}"
 ; !endif
 
 InstallDir "C:\Cocos"
@@ -101,11 +101,11 @@ Section "Prebuilt libs" SectionPrebuilt
 
   ; install frameworks
   SetOutPath "$INSTDIR\frameworks"
-  File /r /x .DS_Store "${ROOTPATH}\gen\cocos\frameworks\*.*"
+  File /r /x .DS_Store "${ROOTPATH}\gen\${PRODUCTNAME}\frameworks\*.*"
 
   ; install templates
   SetOutPath "$INSTDIR\templates"
-  File /r /x .DS_Store "${ROOTPATH}\gen\cocos\templates\*.*"
+  File /r /x .DS_Store "${ROOTPATH}\gen\${PRODUCTNAME}\templates\*.*"
 
 SectionEnd
 
@@ -115,7 +115,7 @@ Section /o "Source Code" SectionSource
   SetOutPath $INSTDIR
   
   ; Put file there
-  File /r /x .DS_Store "${ROOTPATH}\gen-src\cocos\*.*"
+  File /r /x .DS_Store "${ROOTPATH}\gen-src\${PRODUCTNAME}\*.*"
   
 SectionEnd
 
@@ -128,7 +128,7 @@ Section "Tools" SectionTools
 
   ; install ant
   SetOutPath "${ToolsDir}\ant"
-  File /r /x .DS_Store "${ROOTPATH}\gen\cocos\tools\ant\*.*"
+  File /r /x .DS_Store "${ROOTPATH}\gen\${PRODUCTNAME}\tools\ant\*.*"
 
   ; install files for windows
   SetOutPath "$INSTDIR"

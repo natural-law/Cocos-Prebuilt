@@ -2,14 +2,14 @@
     "copy_config" : [
         {
             "from": "cocos2d-x/build",
-            "to": "gen-src/cocos/frameworks/cocos2d-x/build",
+            "to": "gen-src/Cocos/frameworks/cocos2d-x/build",
             "include": [
                 "cocos2d_libs.xcodeproj"
             ]
         },
         {
             "from": "cocos2d-x/cocos",
-            "to": "gen-src/cocos/frameworks/cocos2d-x/cocos",
+            "to": "gen-src/Cocos/frameworks/cocos2d-x/cocos",
             "exclude": [
                 "*.h$",
                 "*.hpp$",
@@ -29,7 +29,7 @@
         },
         {
             "from": "cocos2d-x/cocos/audio",
-            "to": "gen-src/cocos/frameworks/cocos2d-x/cocos/audio",
+            "to": "gen-src/Cocos/frameworks/cocos2d-x/cocos/audio",
             "include": [
                 "ios/*.h$",
                 "mac/*.h$",
@@ -39,7 +39,7 @@
         },
         {
             "from": "cocos2d-x/extensions",
-            "to": "gen-src/cocos/frameworks/cocos2d-x/extensions",
+            "to": "gen-src/Cocos/frameworks/cocos2d-x/extensions",
             "exclude": [
                 "*.h$",
                 "*wp8",
@@ -53,7 +53,7 @@
         },
         {
             "from": "cocos2d-x/external",
-            "to": "gen-src/cocos/frameworks/cocos2d-x/external",
+            "to": "gen-src/Cocos/frameworks/cocos2d-x/external",
             "include": [
                 "*prebuilt/ios/*",
                 "*prebuilt/mac/*",
@@ -79,14 +79,14 @@
         },
         {
             "from": "cocos2d-x",
-            "to": "gen/cocos/frameworks/cocos2d-x",
+            "to": "gen/Cocos/frameworks/cocos2d-x",
             "include": [
                 "setup.py$"
             ]
         },
         {
             "from": "cocos2d-x/cocos",
-            "to": "gen/cocos/frameworks/cocos2d-x/cocos",
+            "to": "gen/Cocos/frameworks/cocos2d-x/cocos",
             "exclude": [
                 "*.cpp$",
                 "*.c$",
@@ -112,14 +112,14 @@
         },
         {
             "from": "cocos2d-x/cocos/scripting/lua-bindings/proj.android",
-            "to": "gen/cocos/frameworks/cocos2d-x/cocos/scripting/lua-bindings/proj.android",
+            "to": "gen/Cocos/frameworks/cocos2d-x/cocos/scripting/lua-bindings/proj.android",
             "include": [
                 "Android.mk"
             ]
         },
         {
             "from": "cocos2d-x/extensions",
-            "to": "gen/cocos/frameworks/cocos2d-x/extensions",
+            "to": "gen/Cocos/frameworks/cocos2d-x/extensions",
             "include": [
                 "Android.mk",
                 "cocos-ext.h",
@@ -131,7 +131,7 @@
         },
         {
             "from": "cocos2d-x/external",
-            "to": "gen/cocos/frameworks/cocos2d-x/external",
+            "to": "gen/Cocos/frameworks/cocos2d-x/external",
             "exclude": [
                 "*.cpp$",
                 "*.c$",
@@ -157,7 +157,7 @@
         },
         {
             "from": "cocos2d-x/plugin",
-            "to": "gen/cocos/frameworks/cocos2d-x/plugin",
+            "to": "gen/Cocos/frameworks/cocos2d-x/plugin",
             "exclude": [
                 "plugin-x_ios.xcworkspace",
                 "samples/*",
@@ -167,7 +167,7 @@
         },
         {
             "from": "cocos2d-x/tools/cocos2d-console",
-            "to": "gen/cocos/frameworks/cocos2d-x/tools/cocos2d-console",
+            "to": "gen/Cocos/frameworks/cocos2d-x/tools/cocos2d-console",
             "exclude": [
                 "config.json",
                 "download-bin.py",
@@ -178,35 +178,35 @@
         },
         {
             "from": "x-modified",
-            "to": "gen/cocos/frameworks/cocos2d-x"
+            "to": "gen/Cocos/frameworks/cocos2d-x"
         }
     ],
     "android_mks" : [
-        "gen/cocos/frameworks/cocos2d-x/external/protobuf-lite/Android.mk",
-        "gen/cocos/frameworks/cocos2d-x/external/Box2D/Android.mk",
-        "gen/cocos/frameworks/cocos2d-x/cocos/editor-support/cocosbuilder/Android.mk",
-        "gen/cocos/frameworks/cocos2d-x/extensions/Android.mk",
-        "gen/cocos/frameworks/cocos2d-x/cocos/3d/Android.mk",
-        "gen/cocos/frameworks/cocos2d-x/cocos/ui/Android.mk",
-        "gen/cocos/frameworks/cocos2d-x/cocos/scripting/lua-bindings/proj.android/Android.mk",
-        "gen/cocos/frameworks/cocos2d-x/cocos/editor-support/cocostudio/Android.mk",
-        "gen/cocos/frameworks/cocos2d-x/cocos/network/Android.mk",
-        "gen/cocos/frameworks/cocos2d-x/cocos/platform/android/Android.mk",
-        "gen/cocos/frameworks/cocos2d-x/cocos/editor-support/spine/Android.mk"
+        "gen/Cocos/frameworks/cocos2d-x/external/protobuf-lite/Android.mk",
+        "gen/Cocos/frameworks/cocos2d-x/external/Box2D/Android.mk",
+        "gen/Cocos/frameworks/cocos2d-x/cocos/editor-support/cocosbuilder/Android.mk",
+        "gen/Cocos/frameworks/cocos2d-x/extensions/Android.mk",
+        "gen/Cocos/frameworks/cocos2d-x/cocos/3d/Android.mk",
+        "gen/Cocos/frameworks/cocos2d-x/cocos/ui/Android.mk",
+        "gen/Cocos/frameworks/cocos2d-x/cocos/scripting/lua-bindings/proj.android/Android.mk",
+        "gen/Cocos/frameworks/cocos2d-x/cocos/editor-support/cocostudio/Android.mk",
+        "gen/Cocos/frameworks/cocos2d-x/cocos/network/Android.mk",
+        "gen/Cocos/frameworks/cocos2d-x/cocos/platform/android/Android.mk",
+        "gen/Cocos/frameworks/cocos2d-x/cocos/editor-support/spine/Android.mk"
     ],
     "xcode_proj_info" : {
         "cocos2d-x/build/cocos2d_libs.xcodeproj" : {
-            "outputdir" : "gen/cocos/frameworks/cocos2d-x/prebuilt",
+            "outputdir" : "gen/Cocos/frameworks/cocos2d-x/prebuilt",
             "targets" :[ "libcocos2d" ]
         },
         "cocos2d-x/cocos/scripting/lua-bindings/proj.ios_mac/cocos2d_lua_bindings.xcodeproj" : {
-            "outputdir" : "gen/cocos/frameworks/cocos2d-x/prebuilt",
+            "outputdir" : "gen/Cocos/frameworks/cocos2d-x/prebuilt",
             "targets" : [ "libluacocos2d" ]
         }
     },
     "win32_proj_info" : {
         "cocos2d-x/build/cocos2d-win32.vc2012.sln" : {
-            "outputdir" : "gen/cocos/frameworks/cocos2d-x/prebuilt/win32",
+            "outputdir" : "gen/Cocos/frameworks/cocos2d-x/prebuilt/win32",
             "targets" : [
                 "libcocos2d", "libluacocos2d", "libSpine", "libbox2d"
             ]

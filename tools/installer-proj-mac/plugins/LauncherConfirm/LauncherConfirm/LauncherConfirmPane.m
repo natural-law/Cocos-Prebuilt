@@ -10,7 +10,7 @@
 
 @implementation LauncherConfirmPane
 
-NSString* launcherPath = @"/Applications/cocos/Cocos.app";
+NSString* launcherPath = @"/Applications/Cocos/Cocos.app";
 
 - (void)didEnterPane:(InstallerSectionDirection)aDir
 {

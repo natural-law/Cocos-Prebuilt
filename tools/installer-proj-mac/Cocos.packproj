@@ -80,7 +80,7 @@
 												<key>GID</key>
 												<integer>20</integer>
 												<key>Path</key>
-												<string>../../gen/cocos</string>
+												<string>../../gen/Cocos</string>
 												<key>Path Type</key>
 												<integer>2</integer>
 												<key>Privileges</key>
@@ -622,7 +622,7 @@ Framework: cocos2d-x</string>
 												<key>GID</key>
 												<integer>20</integer>
 												<key>Path</key>
-												<string>../../gen-src/cocos</string>
+												<string>../../gen-src/Cocos</string>
 												<key>Path Type</key>
 												<integer>2</integer>
 												<key>Privileges</key>
