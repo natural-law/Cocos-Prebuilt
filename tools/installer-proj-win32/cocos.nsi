@@ -124,6 +124,8 @@ SectionGroupEnd
 ; Section 2
 Section "Tools" SectionTools
 
+  SectionIn RO
+
   ; install ant
   SetOutPath "${ToolsDir}\ant"
   File /r /x .DS_Store "${ROOTPATH}\gen\cocos\tools\ant\*.*"
