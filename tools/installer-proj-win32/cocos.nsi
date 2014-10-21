@@ -365,7 +365,6 @@ Function .onInit
   StrCpy $typeValue $0
 
   StrCpy $checkStr "Win$winVersion-$winBit-$spValue-Type$typeValue"
-  MessageBox MB_OK '$checkStr'
   ${If} $checkStr == "Win8.1-32-0-Type48"
     SetRebootFlag true
   ${OrIf} $checkStr == "Win8.1-32-0-Type101"
