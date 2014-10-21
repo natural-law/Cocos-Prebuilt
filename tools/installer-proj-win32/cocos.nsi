@@ -20,6 +20,9 @@
 !include nsDialogs.nsh
 !include "resources\SamplesDir.nsdinc"
 
+!include WinVer.nsh
+!include x64.nsh
+
 ; Declare used functions
 ${StrLoc}
 
@@ -60,9 +63,9 @@ UninstallIcon resources\icon.ico
  
     # These indented statements modify settings for MUI_PAGE_FINISH
     !define MUI_FINISHPAGE_NOAUTOCLOSE
-    !define MUI_FINISHPAGE_RUN
-    !define MUI_FINISHPAGE_RUN_TEXT "Start ${PRODUCTNAME}"
-    !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchLink"
+    # !define MUI_FINISHPAGE_RUN
+    # !define MUI_FINISHPAGE_RUN_TEXT "Start ${PRODUCTNAME}"
+    # !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchLink"
   !insertmacro MUI_PAGE_FINISH
  
 
@@ -134,6 +137,10 @@ Section "Tools" SectionTools
   SetOutPath "$INSTDIR"
   File /r /x .DS_Store /x ${JDKINSTALLER} "${ROOTPATH}\gen-win32\${BitFlag}\*.*"
 
+  ; Write install path into registry
+  SetRegView ${RegView}
+  WriteRegStr HKLM "Software\Cocos" "InstallDir" "$INSTDIR"
+
   ; unzip jdk.exe & Cocos Studio.exe into temp directory
   SetOutPath $TEMP
   File "resources\${RunFirstBat}"
@@ -145,7 +152,7 @@ Section "Tools" SectionTools
 
   ; install jdk & Cocos Studio
   ExecWait '"$TEMP\${JDKInstaller}" /s'
-  ExecWait '"$TEMP\${StudioInstaller}" "/S:$TEMP\${StudioSetupINI}" /Doc "$samplesDir" /NOINIT'
+  ExecWait '"$TEMP\${StudioInstaller}" "/S:$TEMP\${StudioSetupINI}" /Doc "$samplesDir" /NoRestart /NOINIT'
 
   ; unzip the android SDK & NDK
   ; InitPluginsDir
@@ -165,10 +172,6 @@ Section "Tools" SectionTools
   Call AddPath
   StrCpy $needAddPath "%JAVA_HOME%\bin"
   Call AddPath
-
-  ; Write install path into registry
-  SetRegView ${RegView}
-  WriteRegStr HKLM "Software\Cocos" "InstallDir" "$INSTDIR"
 
   ; invoke the setup.py
   ExecWait '"${ToolsDir}\Python27\python.exe" "${XDir}\setup.py" -a "" -n "${ToolsDir}\android-ndk-r9d" -t "${ToolsDir}\ant\bin"'
@@ -222,12 +225,150 @@ Function dir_leave
   ${EndIf}
 Functionend
 
-Function LaunchLink
-  ExecShell "" "${StudioDir}\CocosStudio.Launcher.exe"
-FunctionEnd
+# Function LaunchLink
+#   ExecShell "" "${StudioDir}\CocosStudio.Launcher.exe"
+# FunctionEnd
 
 Function fnc_SamplesDir_Leave
   ${NSD_GetText} $hCtl_SamplesDir_DirRequest1_Txt $0
   StrCpy $samplesDir $0
 FunctionEnd
 
+Function GetWindowsVersion
+ 
+  Push $R0
+  Push $R1
+ 
+  ClearErrors
+ 
+  ReadRegStr $R0 HKLM \
+  "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
+ 
+  IfErrors 0 lbl_winnt
+ 
+  ; we are not NT
+  ReadRegStr $R0 HKLM \
+  "SOFTWARE\Microsoft\Windows\CurrentVersion" VersionNumber
+ 
+  StrCpy $R1 $R0 1
+  StrCmp $R1 '4' 0 lbl_error
+ 
+  StrCpy $R1 $R0 3
+ 
+  StrCmp $R1 '4.0' lbl_win32_95
+  StrCmp $R1 '4.9' lbl_win32_ME lbl_win32_98
+ 
+  lbl_win32_95:
+    StrCpy $R0 '95'
+  Goto lbl_done
+ 
+  lbl_win32_98:
+    StrCpy $R0 '98'
+  Goto lbl_done
+ 
+  lbl_win32_ME:
+    StrCpy $R0 'ME'
+  Goto lbl_done
+ 
+  lbl_winnt:
+ 
+  StrCpy $R1 $R0 1
+ 
+  StrCmp $R1 '3' lbl_winnt_x
+  StrCmp $R1 '4' lbl_winnt_x
+ 
+  StrCpy $R1 $R0 3
+ 
+  StrCmp $R1 '5.0' lbl_winnt_2000
+  StrCmp $R1 '5.1' lbl_winnt_XP
+  StrCmp $R1 '5.2' lbl_winnt_2003
+  StrCmp $R1 '6.0' lbl_winnt_vista
+  StrCmp $R1 '6.1' lbl_winnt_7
+  StrCmp $R1 '6.2' lbl_winnt_8
+  StrCmp $R1 '6.3' lbl_winnt_81
+  StrCmp $R1 '6.4' lbl_winnt_10 lbl_error
+ 
+  lbl_winnt_x:
+    StrCpy $R0 "NT $R0" 6
+  Goto lbl_done
+ 
+  lbl_winnt_2000:
+    Strcpy $R0 '2000'
+  Goto lbl_done
+ 
+  lbl_winnt_XP:
+    Strcpy $R0 'XP'
+  Goto lbl_done
+ 
+  lbl_winnt_2003:
+    Strcpy $R0 '2003'
+  Goto lbl_done
+ 
+  lbl_winnt_vista:
+    Strcpy $R0 'Vista'
+  Goto lbl_done
+ 
+  lbl_winnt_7:
+    Strcpy $R0 '7'
+  Goto lbl_done
+ 
+  lbl_winnt_8:
+    Strcpy $R0 '8'
+  Goto lbl_done
+ 
+  lbl_winnt_81:
+    Strcpy $R0 '8.1'
+  Goto lbl_done
+ 
+  lbl_winnt_10:
+    Strcpy $R0 '10.0'
+  Goto lbl_done
+ 
+  lbl_error:
+    Strcpy $R0 ''
+  lbl_done:
+ 
+  Pop $R1
+  Exch $R0
+ 
+FunctionEnd
+ 
+!macro GetWindowsVersion OUTPUT_VALUE
+  Call GetWindowsVersion
+  Pop `${OUTPUT_VALUE}`
+!macroend
+ 
+!define GetWindowsVersion '!insertmacro "GetWindowsVersion"'
+
+Function .onInit
+  Var /GLOBAL winBit
+  Var /GLOBAL winVersion
+  Var /GLOBAL spValue
+  Var /GLOBAL typeValue
+  Var /GLOBAL checkStr
+
+  ${GetWindowsVersion} $winVersion
+
+  ${If} ${RunningX64}
+    StrCpy $winBit "64"
+  ${Else}
+    StrCpy $winBit "32"
+  ${EndIf}
+
+  ${If} ${IsServicePack} 0
+    StrCpy $spValue "0"
+  ${Else}
+    StrCpy $spValue ""
+  ${EndIf}
+
+  System::Call kernel32::GetProductInfo(i6,i0,i0,i0,*i.r0)
+  StrCpy $typeValue $0
+
+  StrCpy $checkStr "Win$winVersion-$winBit-$spValue-Type$typeValue"
+  MessageBox MB_OK '$checkStr'
+  ${If} $checkStr == "Win8.1-32-0-Type48"
+    SetRebootFlag true
+  ${OrIf} $checkStr == "Win8.1-32-0-Type101"
+    SetRebootFlag true
+  ${EndIf}
+FunctionEnd
