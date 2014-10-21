@@ -39,7 +39,7 @@ cp -rf "${PKG_FILE_PATH}" "${TMP_DIR}"
 # fi
 
 # sign the pkg
-productsign --sign "3rd Party Mac Developer Application: CocoaChina (U7E7529TA5)" "${TMP_DIR}/${PROJ_NAME}.${PKG_EXTENSION}" "${TMP_DIR}/${SIGNED_PKG_NAME}"
+productsign --sign "Developer ID Application: CocoaChina (U7E7529TA5)" "${TMP_DIR}/${PROJ_NAME}.${PKG_EXTENSION}" "${TMP_DIR}/${SIGNED_PKG_NAME}"
 
 # rename the pkg files
 mv "${TMP_DIR}/${PROJ_NAME}.${PKG_EXTENSION}" "${TMP_DIR}/${UNSIGNED_PKG_NAME}"
