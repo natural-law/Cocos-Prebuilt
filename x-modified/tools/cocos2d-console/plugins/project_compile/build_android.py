@@ -337,7 +337,12 @@ class AndroidBuilder(object):
         # invoke custom step: pre-ant-build
         self._project.invoke_custom_step_script(cocos_project.Project.CUSTOM_STEP_PRE_ANT_BUILD, target_platform, args_ant_copy)
 
-        command = "%s clean %s -f %s -Dsdk.dir=%s -DENGINE_ROOT=%s" % (cocos.CMDRunner.convert_path_to_cmd(ant_path), build_mode, buildfile_path, cocos.CMDRunner.convert_path_to_cmd(sdk_root), os.path.relpath(cocos_root, app_android_root))
+        if cocos.os_is_win32():
+            engine_root = cocos_root
+        else:
+            engine_root = os.path.relpath(cocos_root, app_android_root)
+
+        command = "%s clean %s -f %s -Dsdk.dir=%s -DENGINE_ROOT=%s" % (cocos.CMDRunner.convert_path_to_cmd(ant_path), build_mode, buildfile_path, cocos.CMDRunner.convert_path_to_cmd(sdk_root), engine_root)
         self._run_cmd(command)
 
         # invoke custom step: post-ant-build
