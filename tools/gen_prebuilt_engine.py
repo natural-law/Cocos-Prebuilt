@@ -664,17 +664,6 @@ class Generator(object):
         }
         excopy.copy_files_with_config(cfg, self.root_dir, self.root_dir)
 
-        # copy cocos2dx_files.json
-        if engine_name == "cocos2d-x":
-            cfg = {
-                "from": template_dir_name,
-                "to": os.path.join("gen/Cocos/frameworks", engine_name, "templates"),
-                "include": [
-                    "cocos2dx_files.json"
-                ]
-            }
-            excopy.copy_files_with_config(cfg, self.root_dir, self.root_dir)
-
         # generate the env.json for new projects
         env_path = os.path.join(self.root_dir, "gen/Cocos/frameworks", engine_name, "tools/cocos2d-console/plugins/project_new/env.json")
         template_root_cfg = "COCOS_ROOT/../../templates/%s" % ver

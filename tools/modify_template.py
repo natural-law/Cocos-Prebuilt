@@ -54,18 +54,21 @@ class TemplateModifier(object):
 
         if language == "cpp":
             targetName = "HelloCpp"
-            template_engine_path = os.path.join(self.engine_path, "templates/cpp-template-default/cocos2d")
+            engine_path = "/Applications/Cocos/frameworks/cocos2d-x"
             link_libs = XCODE_LINK_CPP_LIBS
+            old_engine_path = "$(SRCROOT)/../cocos2d"
             xcode_proj_path = os.path.join(self.engine_path, "templates/cpp-template-default/proj.ios_mac")
         elif language == "lua":
             targetName = "HelloLua"
-            template_engine_path = os.path.join(self.engine_path, "templates/lua-template-runtime/frameworks/cocos2d-x")
+            engine_path = "/Applications/Cocos/frameworks/cocos2d-x"
             link_libs = XCODE_LINK_CPP_LIBS + XCODE_LINK_LUA_LIBS
+            old_engine_path = "$(SRCROOT)/../../cocos2d-x"
             xcode_proj_path = os.path.join(self.engine_path, "templates/lua-template-runtime/frameworks/runtime-src/proj.ios_mac")
         else:
             targetName = "HelloJavascript"
-            template_engine_path = os.path.join(self.engine_path, "templates/js-template-runtime/frameworks/js-bindings")
+            engine_path = "/Applications/Cocos/frameworks/cocos2d-js"
             link_libs = XCODE_LINK_CPP_LIBS + XCODE_LINK_JS_LIBS
+            old_engine_path = "$(SRCROOT)/../../cocos2d-js"
             xcode_proj_path = os.path.join(self.engine_path, "templates/js-template-runtime/frameworks/runtime-src/proj.ios_mac")
         ios_target_name = "%s iOS" % targetName
         mac_target_name = "%s Mac" % targetName
@@ -76,10 +79,10 @@ class TemplateModifier(object):
             pbx_proj.remove_proj_reference("cocos2d_lua_bindings.xcodeproj")
 
         # add libraries search path
-        ios_template_prebuilt_path = os.path.join(template_engine_path, IOS_PREBUILT_PATH)
-        pbx_proj.add_library_search_paths(os.path.relpath(ios_template_prebuilt_path, xcode_proj_path), target_name=ios_target_name, recursive=False)
-        mac_template_prebuilt_path = os.path.join(template_engine_path, MAC_PREBUILT_PATH)
-        pbx_proj.add_library_search_paths(os.path.relpath(mac_template_prebuilt_path, xcode_proj_path), target_name=mac_target_name, recursive=False)
+        ios_template_prebuilt_path = os.path.join(engine_path, IOS_PREBUILT_PATH)
+        pbx_proj.add_library_search_paths(ios_template_prebuilt_path, target_name=ios_target_name, recursive=False)
+        mac_template_prebuilt_path = os.path.join(engine_path, MAC_PREBUILT_PATH)
+        pbx_proj.add_library_search_paths(mac_template_prebuilt_path, target_name=mac_target_name, recursive=False)
 
         # add libraries for targets
         ios_lib_group = pbx_proj.get_or_create_group("ios-libs")
@@ -87,10 +90,10 @@ class TemplateModifier(object):
         for lib in link_libs:
             ios_lib_name = "%s iOS.a" % lib
             mac_lib_name = "%s Mac.a" % lib
-            ios_lib_path = os.path.join(os.path.relpath(ios_template_prebuilt_path, xcode_proj_path), ios_lib_name)
+            ios_lib_path = os.path.join(ios_template_prebuilt_path, ios_lib_name)
             pbx_proj.add_file_if_doesnt_exist(ios_lib_path, ios_lib_group, tree="<group>", target=ios_target_name)
 
-            mac_lib_path = os.path.join(os.path.relpath(mac_template_prebuilt_path, xcode_proj_path), mac_lib_name)
+            mac_lib_path = os.path.join(mac_template_prebuilt_path, mac_lib_name)
             pbx_proj.add_file_if_doesnt_exist(mac_lib_path, mac_lib_group, tree="<group>", target=mac_target_name)
 
         # add studio resources to the xcode project of cpp template
@@ -109,6 +112,16 @@ class TemplateModifier(object):
         if pbx_proj.modified:
             pbx_proj.save()
 
+        # modify the engine path
+        f = open(proj_file_path)
+        file_content = f.read()
+        f.close()
+
+        file_content = file_content.replace(old_engine_path, engine_path)
+        f = open(proj_file_path, "w")
+        f.write(file_content)
+        f.close()
+
     def modify_vs_proj(self, proj_file_path, language):
         proj_modifier_path = os.path.join(os.path.dirname(__file__), "proj_modifier")
         sys.path.append(proj_modifier_path)
@@ -119,12 +132,18 @@ class TemplateModifier(object):
         # remove the project references
         vcx_proj.remove_proj_reference()
 
+        replace_strs = [ "$(EngineRoot)" ]
         if language == "cpp":
             link_libs = WIN32_LINK_CPP_LIBS
+            engine_root = "$(COCOS_X_ROOT)"
+            replace_strs.append("..\..\cocos2d")
         elif language == "lua":
             link_libs = WIN32_LINK_CPP_LIBS + WIN32_LINK_LUA_LIBS
+            engine_root = "$(COCOS_X_ROOT)"
+            replace_strs.append("..\..\cocos2d-x")
         else:
             link_libs = WIN32_LINK_CPP_LIBS + WIN32_LINK_JS_LIBS
+            engine_root = "$(COCOS_JS_ROOT)"
 
         for lib in link_libs:
             lib_name = "%s.lib" % lib
@@ -147,6 +166,8 @@ class TemplateModifier(object):
             file_content = file_content.replace("lua\\lua;", "lua\\luajit\\include;")
 
         file_content = file_content.replace("MultiThreadedDebugDLL", "MultiThreadedDLL")
+        for str in replace_strs:
+            file_content = file_content.replace(str, "%s\\" % engine_root)
         f = open(proj_file_path, "w")
         f.write(file_content)
         f.close()

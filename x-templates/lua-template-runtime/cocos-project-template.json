@@ -49,10 +49,6 @@
                 "proj.win32/HelloLua.sdf"
             ]
         },
-        "append_x_engine": {
-            "from": ".",
-            "to": "frameworks/cocos2d-x"
-        },
         "project_rename": {
             "src_project_name": "HelloLua",
             "files": [

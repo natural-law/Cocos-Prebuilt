@@ -1099,7 +1099,7 @@ class XcodeProject(PBXDict):
             abs_path = f_path
 
             if not os.path.exists(f_path):
-                return results
+                print("Warning: %s not existed!" % f_path)
             elif tree == 'SOURCE_ROOT':
                 f_path = os.path.relpath(f_path, self.source_root)
             else:

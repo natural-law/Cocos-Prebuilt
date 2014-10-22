@@ -55,6 +55,7 @@ import shutil
 import subprocess
 from optparse import OptionParser
 
+COCOS_X_ROOT = 'COCOS_X_ROOT'
 COCOS_CONSOLE_ROOT = 'COCOS_CONSOLE_ROOT'
 NDK_ROOT = 'NDK_ROOT'
 ANDROID_SDK_ROOT = 'ANDROID_SDK_ROOT'
@@ -471,6 +472,19 @@ class SetEnvVar(object):
 
             self._force_update_env(COCOS_CONSOLE_ROOT, cocos_consle_root)
 
+    def set_x_root(self):
+        print("->Check environment variable %s" % COCOS_X_ROOT)
+        cocos_x_root = self.current_absolute_path
+        old_dir = self._find_environment_variable(COCOS_X_ROOT)
+        if old_dir is None:
+            self._set_environment_variable(COCOS_X_ROOT, cocos_x_root)
+        else:
+            if old_dir == cocos_x_root:
+                # is same with before, nothing to do
+                return
+
+            self._force_update_env(COCOS_X_ROOT, cocos_x_root)
+
     def _force_update_unix_env(self, var_name, value):
         import re
         home = os.path.expanduser('~')
@@ -628,6 +642,7 @@ class SetEnvVar(object):
         self.file_used_for_setup = self._get_filepath_for_setup()
         
         self.set_console_root()
+        self.set_x_root()
 
         if self._isWindows():
             print('->Configuration for Android platform only, you can also skip and manually edit your environment variables\n')
