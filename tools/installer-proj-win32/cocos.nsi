@@ -23,6 +23,8 @@
 !include WinVer.nsh
 !include x64.nsh
 
+!include "resources\EnvVarUpdate.nsh"
+
 ; Declare used functions
 ${StrLoc}
 
@@ -74,22 +76,6 @@ UninstallIcon resources\icon.ico
 
 ;Languages
 !insertmacro MUI_LANGUAGE "English"
-
-;--------------------------------
-; Functions
-Var needAddPath
-
-Function AddPath 
-  Var /GLOBAL curPath
-  ReadRegStr $curPath HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "Path"
-
-  Var /GLOBAL findPos
-  ${StrLoc} $findPos "$curPath" "$needAddPath" >
-
-  ${If} $findPos != ""
-    WriteRegExpandStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "Path" "$curPath;$needAddPath"
-  ${EndIf}
-FunctionEnd
 
 Var samplesDir
 
@@ -166,12 +152,10 @@ Section "Tools" SectionTools
 
   ; Modify Registry
   WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "JAVA_HOME" "${JavaHome}"
-  StrCpy $needAddPath "${ToolsDir}\Python27"
-  Call AddPath
-  StrCpy $needAddPath "%JAVA_HOME%\jre\bin"
-  Call AddPath
-  StrCpy $needAddPath "%JAVA_HOME%\bin"
-  Call AddPath
+
+  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "${ToolsDir}\Python27"
+  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "%JAVA_HOME%\jre\bin"
+  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "%JAVA_HOME%\bin"
 
   ; invoke the setup.py
   ExecWait '"${ToolsDir}\Python27\python.exe" "${XDir}\setup.py" -a "" -n "${ToolsDir}\android-ndk-r9d" -t "${ToolsDir}\ant\bin"'
