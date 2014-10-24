@@ -5,7 +5,10 @@ set iniFileName=%~nx1
 
 mkdir "%iniFolder%"
 
-set folderstr=%%AppFolder%%=%2
+set folder=%2
+for /f "useback tokens=*" %%a in ('%folder%') do set folder=%%~a
+
+set folderstr=%%AppFolder%%=%folder%
 
 pushd "%iniFolder%"
 echo [SetupValues] > %iniFileName%

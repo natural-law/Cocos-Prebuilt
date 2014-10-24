@@ -126,6 +126,7 @@ Section "Tools" SectionTools
   ; Write install path into registry
   SetRegView ${RegView}
   WriteRegStr HKLM "Software\Cocos" "InstallDir" "$INSTDIR"
+  WriteRegStr HKLM "Software\Cocos" "CocosCodeIDEDir" "$INSTDIR\IDE"
 
   ; unzip jdk.exe & Cocos Studio.exe into temp directory
   SetOutPath $TEMP
@@ -182,7 +183,7 @@ Section "Uninstall"
 
   ; remove registry
   SetRegView ${RegView}
-  DeleteRegKey HKLM "Software\Cocos"
+  DeleteRegValue HKLM "Software\Cocos" "InstallDir"
 
   RMDir /r /REBOOTOK "$INSTDIR"
 SectionEnd
@@ -204,7 +205,7 @@ Function dir_leave
   Var /GLOBAL spacePos
   ${StrLoc} $spacePos "$INSTDIR" " " >
   ${If} $spacePos != ""
-    MessageBox MB_ICONSTOP|MB_OK '$INSTDIR should not contains space.'
+    MessageBox MB_ICONSTOP|MB_OK '"$INSTDIR" should not contain space.'
     Abort
   ${EndIf}
 Functionend
@@ -216,6 +217,14 @@ Functionend
 Function fnc_SamplesDir_Leave
   ${NSD_GetText} $hCtl_SamplesDir_DirRequest1_Txt $0
   StrCpy $samplesDir $0
+
+  Var /GLOBAL endChar
+  StrCpy $endChar $samplesDir "" -1
+  ${While} $endChar == "\"
+    StrCpy $samplesDir $samplesDir -1
+    StrCpy $endChar $samplesDir "" -1
+  ${EndWhile}
+
 FunctionEnd
 
 Function GetWindowsVersion
@@ -352,6 +361,8 @@ Function .onInit
   ${If} $checkStr == "Win8.1-32-0-Type48"
     SetRebootFlag true
   ${OrIf} $checkStr == "Win8.1-32-0-Type101"
+    SetRebootFlag true
+  ${OrIf} $checkStr == "Win8.1-64-0-Type101"
     SetRebootFlag true
   ${EndIf}
 FunctionEnd
