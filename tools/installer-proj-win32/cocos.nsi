@@ -215,15 +215,79 @@ Functionend
 # FunctionEnd
 
 Function fnc_SamplesDir_Leave
+  Var /GLOBAL errMsg
+  StrCpy $errMsg ""
+
   ${NSD_GetText} $hCtl_SamplesDir_DirRequest1_Txt $0
   StrCpy $samplesDir $0
 
+  ; Remove the '\' at the end
   Var /GLOBAL endChar
   StrCpy $endChar $samplesDir "" -1
   ${While} $endChar == "\"
     StrCpy $samplesDir $samplesDir -1
     StrCpy $endChar $samplesDir "" -1
   ${EndWhile}
+
+  ; check characters 
+  Var /GLOBAL i
+  Var /GLOBAL char
+  Var /GLOBAL ascRet
+
+  StrLen $0 $samplesDir
+  ${ForEach} $i 0 $0 + 1
+    ${If} $i == $0
+      ${Break}
+    ${EndIf}
+
+    StrCpy $char $samplesDir 1 $i
+
+    ${CharToASCII} $ascRet $char
+    ${If} $char == " "
+      StrCpy $errMsg "The path should not contain space."
+      Goto checkEnd
+    ${OrIf} $char == "?"
+      StrCpy $errMsg "The path should not contain special character."
+      Goto checkEnd
+    ${OrIf} $char == "<"
+      StrCpy $errMsg "The path should not contain special character."
+      Goto checkEnd
+    ${OrIf} $char == ">"
+      StrCpy $errMsg "The path should not contain special character."
+      Goto checkEnd
+    ${OrIf} $char == "|"
+      StrCpy $errMsg "The path should not contain special character."
+      Goto checkEnd
+    ${OrIf} $char == "*"
+      StrCpy $errMsg "The path should not contain special character."
+      Goto checkEnd
+    ${OrIf} $char == '"'
+      StrCpy $errMsg "The path should not contain special character."
+      Goto checkEnd
+    ${OrIf} $ascRet == 0
+      StrCpy $errMsg "The path should not contain special character."
+      Goto checkEnd
+    ${EndIf}
+  ${Next}
+
+  ; check the path is valid or not
+  ${If} ${FileExists} '$samplesDir\*.*'
+  ${Else}
+    ClearErrors
+    Createdirectory "$samplesDir"
+    ${If} ${Errors}
+      StrCpy $errMsg "$samplesDir is not a valid path."
+      Goto checkEnd
+    ${Else}
+      RMDir $samplesDir
+    ${EndIf}
+  ${EndIf}
+
+checkEnd:
+  ${If} $errMsg != ""
+    MessageBox MB_OK '$errMsg'
+    Abort
+  ${EndIf}
 
 FunctionEnd
 
