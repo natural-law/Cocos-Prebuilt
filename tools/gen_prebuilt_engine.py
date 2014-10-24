@@ -664,6 +664,35 @@ class Generator(object):
         }
         excopy.copy_files_with_config(cfg, self.root_dir, self.root_dir)
 
+        # copy the java source code to templates
+        if engine_name == "cocos2d-x":
+            cfg = {
+                "from": "cocos2d-x/cocos/platform/android/java/src",
+                "to": os.path.join(dst_dir, "cpp-template-default/proj.android/src"),
+                "include": [
+                    "*.java"
+                ]
+            }
+            excopy.copy_files_with_config(cfg, self.root_dir, self.root_dir)
+
+            cfg = {
+                "from": "cocos2d-x/cocos/platform/android/java/src",
+                "to": os.path.join(dst_dir, "lua-template-runtime/frameworks/runtime-src/proj.android/src"),
+                "include": [
+                    "*.java"
+                ]
+            }
+            excopy.copy_files_with_config(cfg, self.root_dir, self.root_dir)
+        else:
+            cfg = {
+                "from": "cocos2d-x/cocos/platform/android/java/src",
+                "to": os.path.join(dst_dir, "js-template-runtime/frameworks/runtime-src/proj.android/src"),
+                "include": [
+                    "*.java"
+                ]
+            }
+            excopy.copy_files_with_config(cfg, self.root_dir, self.root_dir)
+
         # generate the env.json for new projects
         env_path = os.path.join(self.root_dir, "gen/Cocos/frameworks", engine_name, "tools/cocos2d-console/plugins/project_new/env.json")
         template_root_cfg = "COCOS_ROOT/../../templates/%s" % ver
