@@ -1180,6 +1180,18 @@ class XcodeProject(PBXDict):
             if not os.path.exists(finalLib):
                 os.symlink(srcLib, finalLib)
 
+    def remove_group_by_path(self, grp_path):
+        objs = self.data.get('objects')
+        find_grp = None
+        for key in objs:
+            obj = objs.get(key)
+            if obj.get("isa") == "PBXGroup" and obj.get("path") == grp_path:
+                find_grp = key
+                break
+
+        if find_grp is not None:
+            self.remove_group(find_grp)
+
     def remove_group(self, grp):
         objs = self.data.get('objects')
         group_info = objs.get(grp)

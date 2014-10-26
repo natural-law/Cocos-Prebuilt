@@ -105,9 +105,11 @@ class TemplateModifier(object):
             pbx_proj.remove_file_by_path("fonts")
             pbx_proj.remove_file_by_path("res")
 
-            res_group = pbx_proj.get_or_create_group("Resources")
-            pbx_proj.add_file_if_doesnt_exist("MainScene.csb", res_group, tree="<group>")
-            pbx_proj.add_file_if_doesnt_exist("iphone", res_group, tree="<group>")
+            pbx_proj.remove_group_by_path("../Resources")
+            pbx_proj.add_file_if_doesnt_exist("../Resources", tree="<group>")
+            # res_group = pbx_proj.get_or_create_group("Resources")
+            # pbx_proj.add_file_if_doesnt_exist("MainScene.csb", res_group, tree="<group>")
+            # pbx_proj.add_file_if_doesnt_exist("iphone", res_group, tree="<group>")
 
         if pbx_proj.modified:
             pbx_proj.save()
@@ -136,7 +138,7 @@ class TemplateModifier(object):
         if language == "cpp":
             link_libs = WIN32_LINK_CPP_LIBS
             engine_root = "$(COCOS_X_ROOT)"
-            replace_strs.append("..\..\cocos2d")
+            replace_strs.append("..\cocos2d")
         elif language == "lua":
             link_libs = WIN32_LINK_CPP_LIBS + WIN32_LINK_LUA_LIBS
             engine_root = "$(COCOS_X_ROOT)"
@@ -145,9 +147,9 @@ class TemplateModifier(object):
             link_libs = WIN32_LINK_CPP_LIBS + WIN32_LINK_JS_LIBS
             engine_root = "$(COCOS_JS_ROOT)"
 
-        for lib in link_libs:
-            lib_name = "%s.lib" % lib
-            vcx_proj.add_lib(lib_name)
+        # for lib in link_libs:
+        #     lib_name = "%s.lib" % lib
+        #     vcx_proj.add_lib(lib_name)
 
         copy_libs_cmd = "if not exist \"$(OutDir)\" mkdir \"$(OutDir)\"\n" \
                         "xcopy /Y /Q \"$(EngineRoot)prebuilt\\win32\\*.*\" \"$(OutDir)\"\n"

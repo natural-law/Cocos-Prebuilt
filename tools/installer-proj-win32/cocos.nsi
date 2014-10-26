@@ -162,7 +162,7 @@ Section "Tools" SectionTools
   ExecWait '"${ToolsDir}\Python27\python.exe" "${XDir}\setup.py" -a "" -n "${ToolsDir}\android-ndk-r9d" -t "${ToolsDir}\ant\bin"'
 
   ; creat desktop icon
-  ; CreateShortCut "$desktop\${PRODUCTNAME}.lnk" "${StudioDir}\CocosStudio.Launcher.exe"
+  ; CreateShortCut "$desktop\${PRODUCTNAME}.lnk" "${StudioDir}\Cocos.exe"
   ; CreateShortCut "$desktop\AnySDK.lnk" "$INSTDIR\AnySDK\bin\AnySDK.exe"
   CreateShortCut "$desktop\Cocos Code IDE.lnk" "$INSTDIR\IDE\Cocos Code IDE.exe"
 
@@ -211,7 +211,7 @@ Function dir_leave
 Functionend
 
 # Function LaunchLink
-#   ExecShell "" "${StudioDir}\CocosStudio.Launcher.exe"
+#   ExecShell "" "${StudioDir}\Cocos.exe"
 # FunctionEnd
 
 !define CharToASCII "!insertmacro CharToASCII" 
