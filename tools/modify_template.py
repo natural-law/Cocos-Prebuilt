@@ -106,7 +106,7 @@ class TemplateModifier(object):
             pbx_proj.remove_file_by_path("res")
 
             pbx_proj.remove_group_by_path("../Resources")
-            pbx_proj.add_file_if_doesnt_exist("../Resources", tree="<group>")
+            pbx_proj.add_file_if_doesnt_exist("../res", tree="<group>")
             # res_group = pbx_proj.get_or_create_group("Resources")
             # pbx_proj.add_file_if_doesnt_exist("MainScene.csb", res_group, tree="<group>")
             # pbx_proj.add_file_if_doesnt_exist("iphone", res_group, tree="<group>")

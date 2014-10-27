@@ -25,14 +25,14 @@ LOCAL_EXPORT_LDLIBS := -lGLESv2 \
                        -lz \
                        -landroid
 
-LOCAL_STATIC_LIBRARIES := cocos_freetype2_static
-LOCAL_STATIC_LIBRARIES += cocos_png_static
-LOCAL_STATIC_LIBRARIES += cocos_jpeg_static
-LOCAL_STATIC_LIBRARIES += cocos_tiff_static
-LOCAL_STATIC_LIBRARIES += cocos_webp_static
-LOCAL_STATIC_LIBRARIES += cocos_chipmunk_static
+LOCAL_WHOLE_STATIC_LIBRARIES := cocos_freetype2_static
+LOCAL_WHOLE_STATIC_LIBRARIES += cocos_png_static
+LOCAL_WHOLE_STATIC_LIBRARIES += cocos_jpeg_static
+LOCAL_WHOLE_STATIC_LIBRARIES += cocos_tiff_static
+LOCAL_WHOLE_STATIC_LIBRARIES += cocos_webp_static
+LOCAL_WHOLE_STATIC_LIBRARIES += cocos_chipmunk_static
 
-LOCAL_WHOLE_STATIC_LIBRARIES := cocos2dxandroid_static
+LOCAL_WHOLE_STATIC_LIBRARIES += cocos2dxandroid_static
 
 # define the macro to compile through support/zip_support/ioapi.c
 LOCAL_CFLAGS   :=  -DUSE_FILE32API
@@ -55,13 +55,13 @@ LOCAL_MODULE_FILENAME := libcocos2d
 
 LOCAL_SRC_FILES := ../../prebuilt/android/$(TARGET_ARCH_ABI)/libcocos2d.a
 
-LOCAL_STATIC_LIBRARIES := cocostudio_static
-LOCAL_STATIC_LIBRARIES += audioengine_static
-LOCAL_STATIC_LIBRARIES += cocos3d_static
-LOCAL_STATIC_LIBRARIES += cocosbuilder_static
-LOCAL_STATIC_LIBRARIES += spine_static
-LOCAL_STATIC_LIBRARIES += cocos_network_static
-LOCAL_STATIC_LIBRARIES += box2d_static
+LOCAL_WHOLE_STATIC_LIBRARIES := cocostudio_static
+LOCAL_WHOLE_STATIC_LIBRARIES += audioengine_static
+LOCAL_WHOLE_STATIC_LIBRARIES += cocos3d_static
+LOCAL_WHOLE_STATIC_LIBRARIES += cocosbuilder_static
+LOCAL_WHOLE_STATIC_LIBRARIES += spine_static
+LOCAL_WHOLE_STATIC_LIBRARIES += cocos_network_static
+LOCAL_WHOLE_STATIC_LIBRARIES += box2d_static
 
 include $(BUILD_STATIC_LIBRARY)
 #==============================================================

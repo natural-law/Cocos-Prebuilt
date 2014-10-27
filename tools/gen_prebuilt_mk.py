@@ -255,7 +255,7 @@ class MKGenerator(object):
         dst_lines = self.modify_import_module(dst_lines)
 
         # use whole libs
-        # dst_lines = self.use_whole_lib(dst_lines)
+        dst_lines = self.use_whole_lib(dst_lines)
 
         dst_mk_obj.writelines(dst_lines)
 
