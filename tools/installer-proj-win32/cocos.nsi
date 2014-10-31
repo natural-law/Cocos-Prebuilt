@@ -12,6 +12,7 @@
 !define ToolsDir "$INSTDIR\tools"
 !define XDir "$INSTDIR\frameworks\cocos2d-x"
 !define RunFirstBat "cocos_runfirst.bat"
+!define DisplayVersion "1.0 preview"
 
 !addplugindir ".\resources"
 
@@ -166,6 +167,13 @@ Section "Tools" SectionTools
   ; CreateShortCut "$desktop\AnySDK.lnk" "$INSTDIR\AnySDK\bin\AnySDK.exe"
   CreateShortCut "$desktop\Cocos Code IDE.lnk" "$INSTDIR\IDE\Cocos Code IDE.exe"
 
+  ; Add uninstall in Control Panel
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCTNAME}" "DisplayName" "${PRODUCTNAME}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCTNAME}" "UninstallString" "$INSTDIR\uninstaller.exe"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCTNAME}" "DisplayVersion" "${DisplayVersion}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCTNAME}" "Publisher" "Chukong Inc."
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCTNAME}" "DisplayIcon" "$INSTDIR\Cocos Studio\Cocos.exe"
+
   WriteUninstaller $INSTDIR\uninstaller.exe
 SectionEnd
 
@@ -186,6 +194,9 @@ Section "Uninstall"
   DeleteRegValue HKLM "Software\Cocos" "InstallDir"
 
   RMDir /r /REBOOTOK "$INSTDIR"
+
+  ; remove the registry in Control Panel
+  DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCTNAME}"
 SectionEnd
 
 LangString DESC_Tools ${LANG_ENGLISH} "The tools include Cocos Studio, Cocos Code IDE."
