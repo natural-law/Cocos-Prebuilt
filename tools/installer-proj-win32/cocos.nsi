@@ -167,6 +167,10 @@ Section "Tools" SectionTools
   ; CreateShortCut "$desktop\AnySDK.lnk" "$INSTDIR\AnySDK\bin\AnySDK.exe"
   CreateShortCut "$desktop\Cocos Code IDE.lnk" "$INSTDIR\IDE\Cocos Code IDE.exe"
 
+  ; Add short cut in start menu
+  CreateDirectory "$SMPROGRAMS\${PRODUCTNAME}"
+  CreateShortCut "$SMPROGRAMS\${PRODUCTNAME}\Cocos Code IDE.lnk" "$INSTDIR\IDE\Cocos Code IDE.exe"
+
   ; Add uninstall in Control Panel
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCTNAME}" "DisplayName" "${PRODUCTNAME}"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCTNAME}" "UninstallString" "$INSTDIR\uninstaller.exe"
@@ -192,6 +196,10 @@ Section "Uninstall"
   ; remove registry
   SetRegView ${RegView}
   DeleteRegValue HKLM "Software\Cocos" "InstallDir"
+
+  ; delete the short cut in Start Menu
+  Delete "$SMPROGRAMS\${PRODUCTNAME}\Cocos Code IDE.lnk"
+  RMDir "$SMPROGRAMS\${PRODUCTNAME}"
 
   RMDir /r /REBOOTOK "$INSTDIR"
 
